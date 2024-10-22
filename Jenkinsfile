@@ -3,7 +3,7 @@ pipeline {
     environment {
         ECR_REGISTRY = '860195224276.dkr.ecr.ap-northeast-2.amazonaws.com'
         ECR_REPO_NAME = 'devita_ecr'
-        IMAGE_TAG = 'latest'
+        IMAGE_TAG = 'latest_backend'
         AWS_REGION = 'ap-northeast-2'
         AWS_CREDENTIALS = credentials('AwsCredentials')  // Jenkins credentials에서 한 번에 불러오기
     }
