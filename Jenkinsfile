@@ -1,38 +1,18 @@
 pipeline {
-    agent { label 'ec2-agent' }
+    agent { label 'ec2-devita-back' }
     environment {
         ECR_REGISTRY = '860195224276.dkr.ecr.ap-northeast-2.amazonaws.com'
         ECR_REPO_NAME = 'devita_ecr'
-        IMAGE_TAG = 'latest_backend'
+        IMAGE_TAG = 'latest_back'
         AWS_REGION = 'ap-northeast-2'
         AWS_CREDENTIALS = credentials('AwsCredentials')  // Jenkins credentials에서 한 번에 불러오기
     }
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/KTB-FinalProject-Team1/Devita_Backend' , credentialsId: "githubAccessToken"
-            }
-        }
-        stage('Add Jenkins to Docker Group') {
-            steps {
                 script {
-                    // Jenkins 사용자를 Docker 그룹에 추가
-                    sh '''
-                    sudo usermod -aG docker ubuntu
-                    sudo systemctl restart docker
-                    '''
+                        git branch: 'feat/#6-amiTest', url: 'https://github.com/KTB-FinalProject-Team1/Devita_Backend', credentialsId: "githubAccessToken"
                 }
-            }
-        }
-        stage('Install AWS CLI') {
-            steps {
-                sh '''
-                sudo apt-get update
-                sudo apt-get install -y curl unzip
-                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                unzip awscliv2.zip
-                sudo ./aws/install
-                '''
             }
         }
         stage('Login to ECR') {
@@ -51,6 +31,7 @@ pipeline {
             steps {
                 script {
                     sh '''
+                    ls
                     docker build -t $ECR_REPO_NAME:$IMAGE_TAG .
                     docker tag $ECR_REPO_NAME:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPO_NAME:$IMAGE_TAG
                     '''
