@@ -1,5 +1,6 @@
 package com.devita.user.oauth;
 
+import com.devita.common.exception.ErrorCode;
 import com.devita.user.domain.AuthProvider;
 import com.devita.user.domain.User;
 import com.devita.user.repository.UserRepository;
@@ -33,7 +34,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         if (!"kakao".equals(registrationId)) {
-            throw new OAuth2AuthenticationException("Unsupported OAuth provider: " + registrationId);
+            throw new OAuth2AuthenticationException(ErrorCode.INVALID_TOKEN.getMessage());
         }
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
@@ -45,13 +46,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String profileImage = (String) properties.get("profile_image");
 
         if (email == null) {
-            throw new OAuth2AuthenticationException("Email not found from Kakao account");
+            throw new OAuth2AuthenticationException(ErrorCode.TOKEN_NOT_FOUND.getMessage());
         }
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> new User(email, nickname, AuthProvider.KAKAO, profileImage));
 
-        // 닉네임과 프로필 이미지를 업데이트
         user.updateNickname(nickname);
         userRepository.save(user);
 

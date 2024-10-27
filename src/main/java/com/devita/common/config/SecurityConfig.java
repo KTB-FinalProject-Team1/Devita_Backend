@@ -1,4 +1,4 @@
-package com.devita.config;
+package com.devita.common.config;
 
 import com.devita.user.jwt.JwtAuthenticationFilter;
 import com.devita.user.jwt.JwtTokenProvider;

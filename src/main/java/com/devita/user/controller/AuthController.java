@@ -1,10 +1,13 @@
 package com.devita.user.controller;
 
+import com.devita.common.exception.ErrorCode;
+import com.devita.common.exception.SecurityTokenException;
+import com.devita.common.response.ApiResponse;
 import com.devita.user.jwt.JwtTokenProvider;
 import com.devita.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,14 +36,20 @@ public class AuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshAccessToken(@CookieValue("refreshToken") String refreshToken) {
+    public ResponseEntity<ApiResponse<String>> refreshAccessToken(@CookieValue("refreshToken") String refreshToken) {
         try {
             Long userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
             String newAccessToken = jwtTokenProvider.refreshAccessToken(refreshToken, userId);
-            return ResponseEntity.ok().header("Authorization", "Bearer " + newAccessToken).build();
-        } catch (Exception e) {
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.add("Authorization", "Bearer " + newAccessToken);
+
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(ApiResponse.success(newAccessToken)); // ApiResponse 형식의 성공 응답 반환
+            } catch (Exception e) {
             log.error("token update failed: {}", e.getMessage());
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new SecurityTokenException(ErrorCode.INTERNAL_TOKEN_SERVER_ERROR);
         }
     }
 }
