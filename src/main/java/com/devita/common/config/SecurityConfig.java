@@ -28,13 +28,14 @@ public class SecurityConfig {
     private final OAuth2LogoutSuccessHandler oAuth2LogoutSuccessHandler;
 
     private static final String[] WHITE_LIST_URL = {
-            "/auth/**",
+            "/api/v1/**",
+            "/api/v1/auth/**",
             "/logout",
             "/swagger-resources",
             "/swagger-resources/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
-            "/api/**"
+            "/api-docs/**",
     };
 
     @Bean
@@ -42,7 +43,7 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(WHITE_LIST_URL).permitAll()
