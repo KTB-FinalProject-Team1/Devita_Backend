@@ -1,4 +1,4 @@
-package com.devita.user.jwt;
+package com.devita.common.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

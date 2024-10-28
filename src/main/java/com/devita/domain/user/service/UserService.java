@@ -1,6 +1,5 @@
-package com.devita.user.service;
+package com.devita.domain.user.service;
 
-import com.devita.user.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

@@ -1,4 +1,4 @@
-package com.devita.user.jwt;
+package com.devita.common.jwt;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;

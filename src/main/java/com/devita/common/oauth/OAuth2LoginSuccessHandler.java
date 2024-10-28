@@ -1,8 +1,9 @@
-package com.devita.user.oauth;
+package com.devita.common.oauth;
 
-import com.devita.user.domain.User;
-import com.devita.user.jwt.JwtTokenProvider;
-import com.devita.user.repository.UserRepository;
+import com.devita.common.exception.ErrorCode;
+import com.devita.domain.user.repository.UserRepository;
+import com.devita.domain.user.domain.User;
+import com.devita.common.jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +17,6 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Map;
 
-// OAuth2 로그인 성공 시 JWT 토큰을 생성하고 응답
 @Slf4j
 @RequiredArgsConstructor
 @Component
@@ -33,15 +33,14 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
         String email = (String) kakaoAccount.get("email");
 
         if (email == null) {
-            throw new OAuth2AuthenticationException("Email not found from Kakao account");
+            throw new OAuth2AuthenticationException(ErrorCode.TOKEN_NOT_FOUND.getMessage());
         }
 
-        User user = userRepository.findByEmail(email).orElseThrow();
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new OAuth2AuthenticationException(ErrorCode.USER_NOT_FOUND.getMessage())
+        );
 
-        String accessToken = jwtTokenProvider.createAccessToken(user.getId());
         jwtTokenProvider.createRefreshToken(response, user.getId());
-
-        response.setHeader("Authorization", "Bearer " + accessToken);
 
         getRedirectStrategy().sendRedirect(request, response, "/home");
     }

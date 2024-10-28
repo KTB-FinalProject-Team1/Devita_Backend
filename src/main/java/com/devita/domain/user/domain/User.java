@@ -1,4 +1,4 @@
-package com.devita.user.domain;
+package com.devita.domain.user.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;

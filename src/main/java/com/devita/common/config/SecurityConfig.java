@@ -1,10 +1,10 @@
-package com.devita.config;
+package com.devita.common.config;
 
-import com.devita.user.jwt.JwtAuthenticationFilter;
-import com.devita.user.jwt.JwtTokenProvider;
-import com.devita.user.oauth.CustomOAuth2UserService;
-import com.devita.user.oauth.OAuth2LoginSuccessHandler;
-import com.devita.user.oauth.OAuth2LogoutSuccessHandler;
+import com.devita.common.jwt.JwtAuthenticationFilter;
+import com.devita.common.jwt.JwtTokenProvider;
+import com.devita.common.oauth.CustomOAuth2UserService;
+import com.devita.common.oauth.OAuth2LoginSuccessHandler;
+import com.devita.common.oauth.OAuth2LogoutSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -27,20 +27,32 @@ public class SecurityConfig {
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LogoutSuccessHandler oAuth2LogoutSuccessHandler;
 
+    private static final String[] WHITE_LIST_URL = {
+            "/api/v1/**",
+            "/api/v1/auth/**",
+            "/logout",
+            "/swagger-resources",
+            "/swagger-resources/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/api-docs/**",
+            "/oauth2/**"
+    };
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authorizeHttpRequests(authz -> authz
-                        .requestMatchers("/", "/auth/**", "/oauth2/**", "/logout").permitAll()
+                        .requestMatchers(WHITE_LIST_URL).permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
-                        .loginPage("/auth/login")
+                        .loginPage("/oauth2/authorization/kakao")
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )

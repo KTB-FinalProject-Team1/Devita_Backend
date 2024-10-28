@@ -1,6 +1,6 @@
-package com.devita.user.repository;
+package com.devita.domain.user.repository;
 
-import com.devita.user.domain.User;
+import com.devita.domain.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.Optional;
 
