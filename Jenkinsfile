@@ -1,48 +1,61 @@
 pipeline {
-    agent { label 'ec2-agent' }
+    agent { label 'ec2-devita-back' }
+
     environment {
         ECR_REGISTRY = '860195224276.dkr.ecr.ap-northeast-2.amazonaws.com'
         ECR_REPO_NAME = 'devita_ecr'
-        IMAGE_TAG = 'latest_backend'
+        IMAGE_TAG = 'latest_back'
         AWS_REGION = 'ap-northeast-2'
-        AWS_CREDENTIALS = credentials('AwsCredentials')  // Jenkins credentials에서 한 번에 불러오기
+        AWS_CREDENTIALS = credentials('AwsCredentials')
+        INSTANCE_ID = 'i-086704d461847e1a4'
+
+        AWS_S3_BUCKET = 'devita-env'
+        S3_ENV_FILE = 'application.yaml'
+        LOCAL_ENV_FILE = 'src/main/resources'
     }
     stages {
-        stage('Checkout') {
-            steps {
-                git branch: 'main', url: 'https://github.com/KTB-FinalProject-Team1/Devita_Backend' , credentialsId: "githubAccessToken"
-            }
-        }
-        stage('Add Jenkins to Docker Group') {
+        stage('Check for Previous Builds') {
             steps {
                 script {
-                    // Jenkins 사용자를 Docker 그룹에 추가
-                    sh '''
-                    sudo usermod -aG docker ubuntu
-                    sudo systemctl restart docker
-                    '''
+                    // 현재 Job에서 실행 중인 이전 빌드를 가져옴
+                    def job = Jenkins.instance.getItemByFullName(env.JOB_NAME)
+                    def currentBuildNumber = currentBuild.number
+                    
+                    // 이전 빌드가 실행 중이면 중단시킴
+                    job.builds.each { build ->
+                        if (build.isBuilding() && build.number < currentBuildNumber) {
+                            echo "Cancelling build #${build.number}"
+                            build.doStop()  // 이전 빌드를 중단
+                        }
+                    }
                 }
             }
         }
-        stage('Install AWS CLI') {
+        stage('Checkout') {
             steps {
-                sh '''
-                sudo apt-get update
-                sudo apt-get install -y curl unzip
-                curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                unzip awscliv2.zip
-                sudo ./aws/install
-                '''
+                script {
+                    git branch: 'develop', url: 'https://github.com/KTB-FinalProject-Team1/Devita_Backend', credentialsId: "githubAccessToken"
+                }
             }
         }
         stage('Login to ECR') {
             steps {
                 script {
-                    // AWS 자격 증명을 환경 변수로 설정
                     sh '''
                     export AWS_ACCESS_KEY_ID=$(echo $AWS_CREDENTIALS | cut -d':' -f1)
                     export AWS_SECRET_ACCESS_KEY=$(echo $AWS_CREDENTIALS | cut -d':' -f2)
                     aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+                    '''
+                }
+            }
+        }
+        stage('Download from S3') {
+            steps {
+                script {
+                    sh '''
+                    echo $AWS_ACCESS_KEY_ID
+                    echo $AWS_CREDENTIALS
+                    aws s3 cp s3://$AWS_S3_BUCKET/$S3_ENV_FILE $LOCAL_ENV_FILE --region $AWS_REGION
                     '''
                 }
             }
@@ -66,6 +79,46 @@ pipeline {
                 }
             }
         }
+        stage('Start EC2 Instance and Deploy') {
+            steps {
+                script {
+                    // EC2 인스턴스 시작
+                    sh '''
+                    export AWS_ACCESS_KEY_ID=$(echo $AWS_CREDENTIALS | cut -d':' -f1)
+                    export AWS_SECRET_ACCESS_KEY=$(echo $AWS_CREDENTIALS | cut -d':' -f2)
+                    aws ec2 start-instances --instance-ids $INSTANCE_ID --region $AWS_REGION
+                    aws ec2 wait instance-running --instance-ids $INSTANCE_ID --region $AWS_REGION
+                    '''
+                    
+                    // SSH로 백엔드 인스턴스에 접속하고 환경 변수를 전달
+                    sshagent(['back_PEM']) {
+                        sh '''
+                        ssh -t -o StrictHostKeyChecking=no ubuntu@10.0.1.44 << EOF
+                        export AWS_REGION='$AWS_REGION'
+                        export ECR_REGISTRY='$ECR_REGISTRY'
+                        export ECR_REPO_NAME='$ECR_REPO_NAME'
+                        export IMAGE_TAG='$IMAGE_TAG'
+                        export AWS_ACCESS_KEY_ID=\$(echo "$AWS_CREDENTIALS" | cut -d':' -f1)
+                        export AWS_SECRET_ACCESS_KEY=\$(echo "$AWS_CREDENTIALS" | cut -d':' -f2)
+
+                        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+
+                        # 현재 실행 중이거나 종료된 컨테이너가 있는 경우만 삭제
+                        docker ps -qa | xargs -r docker rm
+                        # 현재 존재하는 이미지를 삭제할 때만 삭제
+                        docker images -q | xargs -r docker rmi
+
+                        docker pull $ECR_REGISTRY/$ECR_REPO_NAME:$IMAGE_TAG
+                        docker images
+
+                        # 기존에 실행 중이던 컨테이너가 있다면 삭제 후 새로운 컨테이너 실행
+                        docker run -d --name devita_back -p 8080:8080 $ECR_REGISTRY/$ECR_REPO_NAME:$IMAGE_TAG
+                        docker ps -a
+                        '''
+                    }
+                }
+            }
+        }
     }
     post {
         always {
@@ -73,3 +126,4 @@ pipeline {
         }
     }
 }
+

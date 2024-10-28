@@ -1,17 +1,19 @@
 # Step 1: Java 17 기반 Debian 이미지 사용
 FROM openjdk:17-jdk-slim as build
 
-# Step 2: 기본 유틸리티 설치 (bash, xargs 등)
+# Step 2: 기본 유틸리티 설치 및 MariaDB, Redis 설치
 RUN apt-get update && apt-get install -y \
     bash \
     coreutils \
-    findutils
+    findutils \
+    mariadb-server \
+    redis-server
 
 # Step 3: 작업 디렉토리 설정
 WORKDIR /app
 
 # Step 4: Gradle Wrapper 파일과 필요한 설정 파일 복사
-COPY gradlew ./
+COPY gradlew ./gradlew
 COPY gradle ./gradle
 COPY build.gradle settings.gradle ./
 
@@ -30,8 +32,22 @@ COPY src ./src
 # Step 9: 프로젝트 빌드
 RUN ./gradlew build --no-daemon -x test
 
-# Step 10: 애플리케이션 포트 설정
-EXPOSE 8080
+# Step 10: 빌드된 jar 파일을 /app.jar로 복사
+RUN cp build/libs/devita-0.0.1-SNAPSHOT.jar /app/app.jar
 
-# Step 11: 애플리케이션 실행
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+# Step 11: MariaDB 초기 설정
+RUN service mariadb start && \
+    mysql -e "CREATE USER 'milo'@'%' IDENTIFIED BY '5188';" && \
+    mysql -e "CREATE DATABASE devita;" && \
+    mysql -e "GRANT ALL PRIVILEGES ON devita.* TO 'milo'@'%';" && \
+    mysql -e "FLUSH PRIVILEGES;"
+
+# Step 12: Redis 서버 시작 명령 추가
+RUN service redis-server start
+
+# Step 13: 애플리케이션 포트 설정
+EXPOSE 8080 3306 6379
+
+# Step 14: 컨테이너 시작 시 MariaDB와 Redis 자동 시작 및 애플리케이션 실행
+CMD service mariadb start && service redis-server start && java -jar /app/app.jar
+
