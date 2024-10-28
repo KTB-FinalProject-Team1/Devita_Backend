@@ -1,9 +1,9 @@
-package com.devita.user.oauth;
+package com.devita.common.oauth;
 
 import com.devita.common.exception.ErrorCode;
-import com.devita.user.domain.AuthProvider;
-import com.devita.user.domain.User;
-import com.devita.user.repository.UserRepository;
+import com.devita.domain.user.domain.AuthProvider;
+import com.devita.domain.user.domain.User;
+import com.devita.domain.user.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

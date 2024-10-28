@@ -1,7 +1,7 @@
-package com.devita.user.oauth;
+package com.devita.common.oauth;
 
-import com.devita.user.jwt.JwtTokenProvider;
-import com.devita.user.jwt.RefreshTokenService;
+import com.devita.common.jwt.JwtTokenProvider;
+import com.devita.common.jwt.RefreshTokenService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

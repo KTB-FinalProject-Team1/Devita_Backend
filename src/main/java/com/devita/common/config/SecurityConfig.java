@@ -1,10 +1,10 @@
 package com.devita.common.config;
 
-import com.devita.user.jwt.JwtAuthenticationFilter;
-import com.devita.user.jwt.JwtTokenProvider;
-import com.devita.user.oauth.CustomOAuth2UserService;
-import com.devita.user.oauth.OAuth2LoginSuccessHandler;
-import com.devita.user.oauth.OAuth2LogoutSuccessHandler;
+import com.devita.common.jwt.JwtAuthenticationFilter;
+import com.devita.common.jwt.JwtTokenProvider;
+import com.devita.common.oauth.CustomOAuth2UserService;
+import com.devita.common.oauth.OAuth2LoginSuccessHandler;
+import com.devita.common.oauth.OAuth2LogoutSuccessHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

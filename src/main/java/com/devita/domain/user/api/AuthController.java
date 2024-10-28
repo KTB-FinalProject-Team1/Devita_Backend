@@ -1,9 +1,9 @@
-package com.devita.user.controller;
+package com.devita.domain.user.api;
 
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.SecurityTokenException;
 import com.devita.common.response.ApiResponse;
-import com.devita.user.jwt.JwtTokenProvider;
+import com.devita.common.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

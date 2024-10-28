@@ -1,9 +1,9 @@
-package com.devita.user.oauth;
+package com.devita.common.oauth;
 
 import com.devita.common.exception.ErrorCode;
-import com.devita.user.domain.User;
-import com.devita.user.jwt.JwtTokenProvider;
-import com.devita.user.repository.UserRepository;
+import com.devita.domain.user.repository.UserRepository;
+import com.devita.domain.user.domain.User;
+import com.devita.common.jwt.JwtTokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
