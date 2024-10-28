@@ -40,10 +40,8 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 () -> new OAuth2AuthenticationException(ErrorCode.USER_NOT_FOUND.getMessage())
         );
 
-        String accessToken = jwtTokenProvider.createAccessToken(user.getId());
         jwtTokenProvider.createRefreshToken(response, user.getId());
 
-        response.setHeader("Authorization", "Bearer " + accessToken);
         getRedirectStrategy().sendRedirect(request, response, "/home");
     }
 }
