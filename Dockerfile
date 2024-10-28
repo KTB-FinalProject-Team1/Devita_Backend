@@ -30,8 +30,17 @@ COPY src ./src
 # Step 9: 프로젝트 빌드
 RUN ./gradlew build --no-daemon -x test
 
-# Step 10: 애플리케이션 포트 설정
+# Step 10: 빌드 결과 확인
+RUN ls -la build/libs/
+
+# Step 11: 빌드된 jar 파일을 /app.jar로 복사
+RUN cp build/libs/devita-0.0.1-SNAPSHOT.jar /app/app.jar
+
+WORKDIR /app
+
+# Step 12: 애플리케이션 포트 설정
 EXPOSE 8080
 
-# Step 11: 애플리케이션 실행
-ENTRYPOINT ["java", "-jar", "/app.jar"]
+# Step 13: 애플리케이션 실행
+ENTRYPOINT ["java", "-jar", "app.jar"]
+    
