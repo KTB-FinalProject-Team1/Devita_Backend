@@ -103,6 +103,7 @@ pipeline {
 
                         aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
 
+                        docker ps -q --filter "name=devita_back" | xargs -r docker stop
                         # 현재 실행 중이거나 종료된 컨테이너가 있는 경우만 삭제
                         docker ps -qa | xargs -r docker rm
                         # 현재 존재하는 이미지를 삭제할 때만 삭제
@@ -126,4 +127,3 @@ pipeline {
         }
     }
 }
-
