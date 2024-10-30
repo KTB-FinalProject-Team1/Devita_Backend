@@ -36,7 +36,7 @@ public class SecurityConfig {
             "/swagger-ui.html",
             "/v3/api-docs/**",
             "/api-docs/**",
-            "/webjars/**",  // 추가
+            "/webjars/**",
             "/oauth2/**"
     };
 
