@@ -23,7 +23,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<String>> sendAccessToken(@CookieValue("refreshToken") String refreshToken) {
         try {
             Long userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
-            String newAccessToken = jwtTokenProvider.refreshAccessToken(refreshToken, userId);
+            String newAccessToken = jwtTokenProvider.validateRefreshToken(refreshToken, userId);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + newAccessToken);
@@ -41,7 +41,7 @@ public class AuthController {
     public ResponseEntity<ApiResponse<String>> refreshAccessToken(@CookieValue("refreshToken") String refreshToken) {
         try {
             Long userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
-            String newAccessToken = jwtTokenProvider.refreshAccessToken(refreshToken, userId);
+            String newAccessToken = jwtTokenProvider.validateRefreshToken(refreshToken, userId);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + newAccessToken);

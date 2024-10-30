@@ -31,11 +31,12 @@ public class SecurityConfig {
             "/api/v1/**",
             "/api/v1/auth/**",
             "/logout",
-            "/swagger-resources",
             "/swagger-resources/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
+            "/v3/api-docs/**",
             "/api-docs/**",
+            "/webjars/**",  // 추가
             "/oauth2/**"
     };
 

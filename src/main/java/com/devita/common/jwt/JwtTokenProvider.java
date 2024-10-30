@@ -34,42 +34,30 @@ public class JwtTokenProvider {
 
     // 액세스 토큰 생성
     public String createAccessToken(Long userId) {
-        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + accessTokenValidityInMilliseconds);
-
-        return Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, accessTokenSecret)
-                .compact();
+        return createToken(userId, accessTokenValidityInMilliseconds, accessTokenSecret);
     }
 
     // 리프레시 토큰 생성
     public String createRefreshToken(HttpServletResponse response, Long userId) {
-        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
-        Date now = new Date();
-        Date validity = new Date(now.getTime() + refreshTokenValidityInMilliseconds);
-
-        String refreshToken = Jwts.builder()
-                .setClaims(claims)
-                .setIssuedAt(now)
-                .setExpiration(validity)
-                .signWith(SignatureAlgorithm.HS256, refreshTokenSecret)
-                .compact();
+        String refreshToken = createToken(userId, refreshTokenValidityInMilliseconds, refreshTokenSecret);
 
         storeRefreshToken(response, userId, refreshToken);
 
         return refreshToken;
     }
 
-    public String refreshAccessToken(String refreshToken, Long userId) {
-        // Redis에서 리프레시 토큰 유효성 확인
-        if (refreshTokenService.hasValidRefreshToken(userId, refreshToken)) {
-            return createAccessToken(userId);
-        }
-        throw new IllegalArgumentException("Invalid refresh token");
+    // 토큰 생성
+    private String createToken(Long userId, long validity, String secret) {
+        Claims claims = Jwts.claims().setSubject(String.valueOf(userId));
+        Date now = new Date();
+        Date expiry = new Date(now.getTime() + validity);
+
+        return Jwts.builder()
+                .setClaims(claims)
+                .setIssuedAt(now)
+                .setExpiration(expiry)
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
     }
 
     public void storeRefreshToken(HttpServletResponse response, Long userId, String refreshToken){
@@ -77,14 +65,29 @@ public class JwtTokenProvider {
         refreshTokenService.saveRefreshToken(userId, refreshToken, refreshTokenValidityInMilliseconds);
 
         // 쿠키에 리프레시 토큰 저장
+        addRefreshTokenCookie(response, refreshToken);
+
+    }
+
+    // 리프레시 토큰 쿠키 생성 및 설정
+    private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
         refreshTokenCookie.setSecure(true);
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setMaxAge((int) (refreshTokenValidityInMilliseconds / 1000));
         response.addCookie(refreshTokenCookie);
-
     }
+
+
+    // 리프레시 토큰 검증
+    public String validateRefreshToken(String refreshToken, Long userId) {
+        if (refreshTokenService.hasValidRefreshToken(userId, refreshToken)) {
+            return createAccessToken(userId);
+        }
+        throw new IllegalArgumentException("Invalid refresh token");
+    }
+
     // 액세스 토큰 검증
     public boolean validateAccessToken(String token) {
         try {
