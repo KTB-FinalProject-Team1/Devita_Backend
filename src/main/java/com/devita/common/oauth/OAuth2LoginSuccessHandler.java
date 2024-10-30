@@ -42,6 +42,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         jwtTokenProvider.createRefreshToken(response, user.getId());
 
-        getRedirectStrategy().sendRedirect(request, response, "/home");
+        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/");
     }
 }
