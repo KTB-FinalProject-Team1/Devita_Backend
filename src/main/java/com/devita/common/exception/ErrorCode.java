@@ -13,10 +13,15 @@ public enum ErrorCode {
 
     // 403 Forbidden
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "접근이 거부되었습니다."),
+    TODO_ACCESS_DENIED(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "해당 사용자에게 할 일 접근 권한이 없습니다.."),
+    CATEGORY_ACCESS_DENIED(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "해당 사용자에게 카테고리 접근 권한이 없습니다.."),
 
     // 404 Not Found
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", "리소스를 찾을 수 없습니다."),
+    TODO_NOT_FOUND(HttpStatus.NOT_FOUND, "TODO_NOT_FOUND", "할 일을 찾을 수 없습니다."),
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "CATEGORY_NOT_FOUND", "카테고리를 찾을 수 없습니다."),
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "사용자를 찾을 수 없습니다."),
+    VIEW_TYPE_NOT_FOUND(HttpStatus.NOT_FOUND, "VIEW_TYPE_NOT_FOUND", "뷰타입은 weekly와 monthly만 받을 수 있습니다."),
 
     // 500 Internal Server Error
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "서버 에러가 발생했습니다."),

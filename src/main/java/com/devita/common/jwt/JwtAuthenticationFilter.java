@@ -26,13 +26,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        String requestURI = request.getRequestURI();
+
+        if (isSwaggerRequest(requestURI)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             String token = resolveToken(request);
-
-            // 토큰이 없을 경우 예외
-            if (token == null) {
-                throw new SecurityTokenException(ErrorCode.TOKEN_NOT_FOUND);
-            }
 
             // 토큰 유효성 검증
             if (!jwtTokenProvider.validateAccessToken(token)) {
@@ -79,5 +81,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return bearerToken.substring(7);
         }
         return null;
+    }
+
+    private boolean isSwaggerRequest(String requestURI) {
+        return requestURI.startsWith("/swagger-resources") ||
+                requestURI.startsWith("/swagger-ui") ||
+                requestURI.startsWith("/v3/api-docs") ||
+                requestURI.startsWith("/api-docs") ||
+                requestURI.startsWith("/webjars");
     }
 }
