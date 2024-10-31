@@ -1,6 +1,6 @@
 package com.devita.domain.user.domain;
 
-import com.devita.domain.todo.domain.Category;
+import com.devita.domain.category.domain.Category;
 import com.devita.domain.todo.domain.Todo;
 import jakarta.persistence.*;
 import lombok.Getter;

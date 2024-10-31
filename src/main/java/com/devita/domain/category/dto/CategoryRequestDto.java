@@ -1,4 +1,4 @@
-package com.devita.domain.todo.dto;
+package com.devita.domain.category.dto;
 
 import lombok.Data;
 

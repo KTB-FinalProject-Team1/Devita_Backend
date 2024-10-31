@@ -1,9 +1,7 @@
 package com.devita.domain.todo.controller;
 
 import com.devita.common.response.ApiResponse;
-import com.devita.domain.todo.domain.Category;
 import com.devita.domain.todo.dto.CalenderDTO;
-import com.devita.domain.todo.dto.CategoryRequestDto;
 import com.devita.domain.todo.dto.TodoRequestDto;
 import com.devita.domain.todo.service.TodoService;
 import lombok.RequiredArgsConstructor;
@@ -53,24 +51,5 @@ public class TodoController {
         return ApiResponse.success(null);
     }
 
-    @PostMapping("/category")
-    public ApiResponse<Long> createCategory(@AuthenticationPrincipal Long userId, @RequestBody CategoryRequestDto categoryRequestDto) {
-        Long categoryId = todoService.createCategory(userId, categoryRequestDto).getCategoryId();
 
-        return ApiResponse.success(categoryId);
-    }
-
-    @PutMapping("/category/{categoryId}")
-    public ApiResponse<Long> updateCategory(@AuthenticationPrincipal Long userId, @PathVariable Long categoryId, @RequestBody CategoryRequestDto categoryRequestDto) {
-        Category updatedCategory = todoService.updateCategory(userId, categoryId, categoryRequestDto);
-
-        return ApiResponse.success(updatedCategory.getCategoryId());
-    }
-
-    @DeleteMapping("/category/{categoryId}")
-    public ApiResponse<Void> deleteCategory(@AuthenticationPrincipal Long userId, @PathVariable Long categoryId) {
-        todoService.deleteCategory(userId, categoryId);
-
-        return ApiResponse.success(null);
-    }
 }
