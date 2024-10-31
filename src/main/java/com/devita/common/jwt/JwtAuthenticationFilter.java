@@ -28,7 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
 
-        if (isSwaggerRequest(requestURI)) {
+        if (isRequest(requestURI)) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -40,27 +40,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (!jwtTokenProvider.validateAccessToken(token)) {
                 throw new SecurityTokenException(ErrorCode.INVALID_TOKEN);
             }
-
-            // 토큰이 만료 검증
-            if (jwtTokenProvider.validateAccessToken(token)) {
-                throw new SecurityTokenException(ErrorCode.TOKEN_EXPIRED);
-            }
-
             String userId = jwtTokenProvider.getUserIdFromToken(token);
-
-            // 필요 시 권한 리스트 추가
             List<GrantedAuthority> authorities = new ArrayList<>();
+            UsernamePasswordAuthenticationToken authentication =
+                    new UsernamePasswordAuthenticationToken(Long.valueOf(userId), null, authorities);
 
-            // 사용자 ID와 권한을 포함한 인증 객체 생성
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                    userId, null, authorities);
-
-            // 요청의 세부 정보를 인증 객체에 설정
             authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-            // SecurityContext에 사용자 인증 정보 저장
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("Set Authentication to security context for '{}', uri: {}", authentication.getName(), request.getRequestURI());
+            log.debug("Authentication set in SecurityContext for user: {}", userId);
+
 
         } catch (SecurityTokenException e) {
             log.error("Cannot set user authentication: {}", e.getMessage());
@@ -83,11 +72,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
-    private boolean isSwaggerRequest(String requestURI) {
+    private boolean isRequest(String requestURI) {
         return requestURI.startsWith("/swagger-resources") ||
                 requestURI.startsWith("/swagger-ui") ||
                 requestURI.startsWith("/v3/api-docs") ||
                 requestURI.startsWith("/api-docs") ||
-                requestURI.startsWith("/webjars");
+                requestURI.startsWith("/webjars") ||
+                requestURI.startsWith("/api/v1/auth/access");
     }
 }
