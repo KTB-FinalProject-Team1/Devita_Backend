@@ -42,6 +42,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         jwtTokenProvider.createRefreshToken(response, user.getId());
 
-        getRedirectStrategy().sendRedirect(request, response, "http://localhost:3000/");
+        getRedirectStrategy().sendRedirect(request, response, "http://devita-front.s3-website.ap-northeast-2.amazonaws.com/");
     }
 }

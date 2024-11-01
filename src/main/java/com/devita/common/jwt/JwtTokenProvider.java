@@ -109,6 +109,16 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
+    public String getRole(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(accessTokenSecret)
+                .parseClaimsJws(token)
+                .getBody();
+
+
+        return claims.get("role", String.class);
+    }
+
     public Long getUserIdFromRefreshToken(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(refreshTokenSecret)

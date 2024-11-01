@@ -24,6 +24,7 @@ public class AuthController {
         try {
             Long userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
             String newAccessToken = jwtTokenProvider.validateRefreshToken(refreshToken, userId);
+            log.debug(newAccessToken);
 
             HttpHeaders headers = new HttpHeaders();
             headers.add("Authorization", "Bearer " + newAccessToken);

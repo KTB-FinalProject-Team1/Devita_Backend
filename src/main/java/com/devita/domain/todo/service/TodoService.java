@@ -3,12 +3,11 @@ package com.devita.domain.todo.service;
 import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
-import com.devita.domain.todo.domain.Category;
+import com.devita.domain.category.domain.Category;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.dto.CalenderDTO;
-import com.devita.domain.todo.dto.CategoryRequestDto;
 import com.devita.domain.todo.dto.TodoRequestDto;
-import com.devita.domain.todo.repository.CategoryRepository;
+import com.devita.domain.category.repository.CategoryRepository;
 import com.devita.domain.todo.repository.TodoRepository;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.repository.UserRepository;
@@ -29,8 +28,14 @@ public class TodoService {
 
     // 할 일 추가
     public Todo addTodo(Long userId, TodoRequestDto todoRequestDto) {
-        User user = userRepository.findById(userId).orElseThrow();
-        Category category = categoryRepository.findById(todoRequestDto.getCategoryId()).orElseThrow();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
+        List<Category> c = categoryRepository.findAll();
+        for (Category a : c){
+            System.out.println(a.toString());
+        }
+        Category category = categoryRepository.findById(todoRequestDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
         Todo todo = new Todo();
         todo.setUser(user);
@@ -70,38 +75,6 @@ public class TodoService {
         Todo todo = todoRepository.findById(todoId).orElseThrow();
         todo.toggleSatatus();
         todoRepository.save(todo);
-    }
-
-    // 카테고리 추가
-    public Category createCategory(Long userId, CategoryRequestDto categoryRequestDto) {
-        User user = userRepository.findById(userId).orElseThrow();
-
-        Category category = new Category();
-        category.setUser(user);
-        category.setName(categoryRequestDto.getName());
-
-        return categoryRepository.save(category);
-    }
-
-    public void deleteCategory(Long userId, Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
-                .filter(t -> t.getUser().getId().equals(userId))  // userId가 일치하는지 확인
-                .orElseThrow(() -> new AccessDeniedException(ErrorCode.CATEGORY_ACCESS_DENIED));
-
-        categoryRepository.delete(category);
-    }
-
-    public Category updateCategory(Long userId, Long categoryId, CategoryRequestDto categoryRequestDto) {
-        Category category = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
-
-        if (!category.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException(ErrorCode.CATEGORY_ACCESS_DENIED);  // userId가 일치하지 않으면 AccessDeniedException 발생
-        }
-
-        category.setName(categoryRequestDto.getName());
-
-        return categoryRepository.save(category);
     }
 
     public List<CalenderDTO> getCalendar(String viewType) {

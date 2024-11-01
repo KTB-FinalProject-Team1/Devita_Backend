@@ -16,8 +16,8 @@ public class CalenderDTO {
 
     public static CalenderDTO fromEntity(Todo todo) {
         CalenderDTO dto = new CalenderDTO();
-        dto.setTodoId(todo.getTodoId());
-        dto.setCategoryId(todo.getCategory().getCategoryId());
+        dto.setTodoId(todo.getId());
+        dto.setCategoryId(todo.getCategory().getId());
         dto.setTitle(todo.getTitle());
         dto.setDate(todo.getDate());
 

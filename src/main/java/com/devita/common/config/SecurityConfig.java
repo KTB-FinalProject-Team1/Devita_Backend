@@ -28,7 +28,6 @@ public class SecurityConfig {
     private final OAuth2LogoutSuccessHandler oAuth2LogoutSuccessHandler;
 
     private static final String[] WHITE_LIST_URL = {
-            "/api/v1/**",
             "/api/v1/auth/**",
             "/logout",
             "/swagger-resources/**",
@@ -37,19 +36,21 @@ public class SecurityConfig {
             "/v3/api-docs/**",
             "/api-docs/**",
             "/webjars/**",
-            "/oauth2/**"
+            "/oauth2/**",
+            "/api/v1/auth/access"
     };
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
-                .sessionManagement(sessionManagement ->
-                        sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                )
+                .sessionManagement(sessionManagement -> {
+                    sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                    log.debug("Session management configured to STATELESS");
+                        })
+                .securityMatcher("/**")
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers(WHITE_LIST_URL).permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2
