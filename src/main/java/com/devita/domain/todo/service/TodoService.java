@@ -77,7 +77,7 @@ public class TodoService {
         todoRepository.save(todo);
     }
 
-    public List<CalenderDTO> getCalendar(String viewType) {
+    public List<CalenderDTO> getCalendar(Long userId, String viewType) {
         LocalDate today = LocalDate.now();
         LocalDate startDate;
         LocalDate endDate;
@@ -98,7 +98,7 @@ public class TodoService {
                 throw new IllegalArgumentException("Invalid viewType. Use 'daily', 'weekly', or 'monthly'.");
         }
 
-        List<Todo> todos = todoRepository.findByDateBetween(startDate, endDate);
+        List<Todo> todos = todoRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
 
         return todos.stream().map(CalenderDTO::fromEntity).toList();
     }
