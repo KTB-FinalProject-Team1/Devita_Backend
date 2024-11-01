@@ -4,12 +4,16 @@ import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
 import com.devita.domain.category.domain.Category;
-import com.devita.domain.category.dto.CategoryRequestDto;
+import com.devita.domain.category.dto.CategoryReqDto;
+import com.devita.domain.category.dto.CategoryResDto;
 import com.devita.domain.category.repository.CategoryRepository;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -19,12 +23,12 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     // 카테고리 추가
-    public Category createCategory(Long userId, CategoryRequestDto categoryRequestDto) {
+    public Category createCategory(Long userId, CategoryReqDto categoryReqDto) {
         User user = userRepository.findById(userId).orElseThrow();
 
         Category category = new Category();
         category.setUser(user);
-        category.setName(categoryRequestDto.getName());
+        category.setName(categoryReqDto.getName());
 
         return categoryRepository.save(category);
     }
@@ -37,7 +41,7 @@ public class CategoryService {
         categoryRepository.delete(category);
     }
 
-    public Category updateCategory(Long userId, Long categoryId, CategoryRequestDto categoryRequestDto) {
+    public Category updateCategory(Long userId, Long categoryId, CategoryReqDto categoryReqDto) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
@@ -45,8 +49,24 @@ public class CategoryService {
             throw new AccessDeniedException(ErrorCode.CATEGORY_ACCESS_DENIED);  // userId가 일치하지 않으면 AccessDeniedException 발생
         }
 
-        category.setName(categoryRequestDto.getName());
+        category.setName(categoryReqDto.getName());
 
         return categoryRepository.save(category);
+    }
+
+    public List<CategoryResDto> findUserCategories(Long userId) {
+        List<Category> categories = categoryRepository.findByUserId(userId);
+        List<CategoryResDto> categoryResDtos = new ArrayList<>();
+
+        for (Category category: categories){
+            CategoryResDto categoryResDto = new CategoryResDto();
+
+            categoryResDto.setId(category.getId());
+            categoryResDto.setName(category.getName());
+
+            categoryResDtos.add(categoryResDto);
+        }
+
+        return categoryResDtos;
     }
 }

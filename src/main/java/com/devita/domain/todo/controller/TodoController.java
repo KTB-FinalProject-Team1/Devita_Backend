@@ -25,6 +25,7 @@ public class TodoController {
 
     @PostMapping
     public ApiResponse<Long> addTodo(@AuthenticationPrincipal Long userId, @RequestBody TodoRequestDto todoRequestDto) {
+        System.out.println(todoRequestDto.toString());
         Long todoId = todoService.addTodo(userId, todoRequestDto).getId();
 
         return ApiResponse.success(todoId);

@@ -6,7 +6,6 @@ import com.devita.common.exception.ResourceNotFoundException;
 import com.devita.domain.category.domain.Category;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.dto.CalenderDTO;
-import com.devita.domain.category.dto.CategoryRequestDto;
 import com.devita.domain.todo.dto.TodoRequestDto;
 import com.devita.domain.category.repository.CategoryRepository;
 import com.devita.domain.todo.repository.TodoRepository;
@@ -29,8 +28,14 @@ public class TodoService {
 
     // 할 일 추가
     public Todo addTodo(Long userId, TodoRequestDto todoRequestDto) {
-        User user = userRepository.findById(userId).orElseThrow();
-        Category category = categoryRepository.findById(todoRequestDto.getCategoryId()).orElseThrow();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
+        List<Category> c = categoryRepository.findAll();
+        for (Category a : c){
+            System.out.println(a.toString());
+        }
+        Category category = categoryRepository.findById(todoRequestDto.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
         Todo todo = new Todo();
         todo.setUser(user);

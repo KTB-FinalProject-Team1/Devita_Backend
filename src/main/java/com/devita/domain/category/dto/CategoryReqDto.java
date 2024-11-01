@@ -3,6 +3,6 @@ package com.devita.domain.category.dto;
 import lombok.Data;
 
 @Data
-public class CategoryRequestDto {
+public class CategoryReqDto {
     private String name;
 }

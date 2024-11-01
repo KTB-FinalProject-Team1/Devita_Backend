@@ -3,7 +3,7 @@ package com.devita.domain.category.service;
 import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ResourceNotFoundException;
 import com.devita.domain.category.domain.Category;
-import com.devita.domain.category.dto.CategoryRequestDto;
+import com.devita.domain.category.dto.CategoryReqDto;
 import com.devita.domain.category.repository.CategoryRepository;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.repository.UserRepository;
@@ -34,7 +34,7 @@ public class CategoryServiceTest {
 
     private User testUser;
     private Category testCategory;
-    private CategoryRequestDto testCategoryRequestDto;
+    private CategoryReqDto testCategoryReqDto;
 
     @BeforeEach
     void setUp() {
@@ -46,8 +46,8 @@ public class CategoryServiceTest {
         testCategory.setUser(testUser);
         testCategory.setName("Test Category");
 
-        testCategoryRequestDto = new CategoryRequestDto();
-        testCategoryRequestDto.setName("Test Category");
+        testCategoryReqDto = new CategoryReqDto();
+        testCategoryReqDto.setName("Test Category");
     }
 
     @Test
@@ -55,7 +55,7 @@ public class CategoryServiceTest {
         when(userRepository.findById(anyLong())).thenReturn(Optional.of(testUser));
         when(categoryRepository.save(any(Category.class))).thenReturn(testCategory);
 
-        Category result = categoryService.createCategory(1L, testCategoryRequestDto);
+        Category result = categoryService.createCategory(1L, testCategoryReqDto);
 
         assertNotNull(result);
         assertEquals(testCategory.getName(), result.getName());
@@ -82,7 +82,7 @@ public class CategoryServiceTest {
 
     @Test
     void updateCategory_Success() {
-        CategoryRequestDto updateDto = new CategoryRequestDto();
+        CategoryReqDto updateDto = new CategoryReqDto();
         updateDto.setName("Updated Category");
 
         when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(testCategory));
@@ -100,7 +100,7 @@ public class CategoryServiceTest {
         when(categoryRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class,
-                () -> categoryService.updateCategory(1L, 1L, testCategoryRequestDto));
+                () -> categoryService.updateCategory(1L, 1L, testCategoryReqDto));
     }
 
     @Test
@@ -109,6 +109,6 @@ public class CategoryServiceTest {
         when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(testCategory));
 
         assertThrows(AccessDeniedException.class,
-                () -> categoryService.updateCategory(1L, 1L, testCategoryRequestDto));
+                () -> categoryService.updateCategory(1L, 1L, testCategoryReqDto));
     }
 }
