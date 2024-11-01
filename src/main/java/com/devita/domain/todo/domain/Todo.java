@@ -13,7 +13,7 @@ import java.time.LocalDate;
 public class Todo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long todoId;
+    private Long id;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -24,7 +24,7 @@ public class Todo {
     private Category category;
 
     private String title;
-    public boolean status;
+    private Boolean status;
     private LocalDate date;
     private String createdAt;
     private String updatedAt;

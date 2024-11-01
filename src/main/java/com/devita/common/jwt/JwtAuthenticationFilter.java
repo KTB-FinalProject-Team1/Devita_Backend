@@ -40,6 +40,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (!jwtTokenProvider.validateAccessToken(token)) {
                 throw new SecurityTokenException(ErrorCode.INVALID_TOKEN);
             }
+
             String userId = jwtTokenProvider.getUserIdFromToken(token);
             List<GrantedAuthority> authorities = new ArrayList<>();
             UsernamePasswordAuthenticationToken authentication =

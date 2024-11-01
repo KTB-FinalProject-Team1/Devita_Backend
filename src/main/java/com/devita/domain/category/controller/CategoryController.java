@@ -17,7 +17,7 @@ public class CategoryController {
 
     @PostMapping("/category")
     public ApiResponse<Long> createCategory(@AuthenticationPrincipal Long userId, @RequestBody CategoryRequestDto categoryRequestDto) {
-        Long categoryId = categoryService.createCategory(userId, categoryRequestDto).getCategoryId();
+        Long categoryId = categoryService.createCategory(userId, categoryRequestDto).getId();
 
         return ApiResponse.success(categoryId);
     }
@@ -26,7 +26,7 @@ public class CategoryController {
     public ApiResponse<Long> updateCategory(@AuthenticationPrincipal Long userId, @PathVariable Long categoryId, @RequestBody CategoryRequestDto categoryRequestDto) {
         Category updatedCategory = categoryService.updateCategory(userId, categoryId, categoryRequestDto);
 
-        return ApiResponse.success(updatedCategory.getCategoryId());
+        return ApiResponse.success(updatedCategory.getId());
     }
 
     @DeleteMapping("/category/{categoryId}")
