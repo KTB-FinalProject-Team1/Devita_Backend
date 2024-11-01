@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -24,6 +25,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
+    @Value("${front.redirectUrl}") private String redirectUrl;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -42,6 +44,6 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
 
         jwtTokenProvider.createRefreshToken(response, user.getId());
 
-        getRedirectStrategy().sendRedirect(request, response, "http://devita-front.s3-website.ap-northeast-2.amazonaws.com/");
+        getRedirectStrategy().sendRedirect(request, response,  redirectUrl);
     }
 }

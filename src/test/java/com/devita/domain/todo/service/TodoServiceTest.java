@@ -131,22 +131,22 @@ public class TodoServiceTest {
     }
 
     @Test
-    void getCalendar_Weekly() {
+    void getCalendar_Weekly_Success() {
         List<Todo> todoList = Arrays.asList(testTodo);
 
-        when(todoRepository.findByDateBetween(any(LocalDate.class), any(LocalDate.class)))
+        when(todoRepository.findByUserIdAndDateBetween(anyLong(), any(LocalDate.class), any(LocalDate.class)))
                 .thenReturn(todoList);
 
-        List<CalenderDTO> result = todoService.getCalendar("weekly");
+        List<CalenderDTO> result = todoService.getCalendar(1L, "weekly");
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
         assertEquals(1, result.size());
-        verify(todoRepository).findByDateBetween(any(LocalDate.class), any(LocalDate.class));
+        verify(todoRepository).findByUserIdAndDateBetween(anyLong(), any(LocalDate.class), any(LocalDate.class));
     }
 
     @Test
     void getCalendar_InvalidViewType() {
-        assertThrows(IllegalArgumentException.class, () -> todoService.getCalendar("invalid"));
+        assertThrows(IllegalArgumentException.class, () -> todoService.getCalendar(1L, "invalid"));
     }
 }

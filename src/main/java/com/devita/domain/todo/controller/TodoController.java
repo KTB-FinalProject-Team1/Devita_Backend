@@ -18,8 +18,8 @@ public class TodoController {
     private final TodoService todoService;
 
     @GetMapping("/calendar")
-    public ApiResponse<List<CalenderDTO>> getCalendar(@RequestParam String viewType) {
-        List<CalenderDTO> todos = todoService.getCalendar(viewType);
+    public ApiResponse<List<CalenderDTO>> getCalendar(@AuthenticationPrincipal Long userId, @RequestParam String viewType) {
+        List<CalenderDTO> todos = todoService.getCalendar(userId, viewType);
         return ApiResponse.success(todos);
     }
 
