@@ -4,6 +4,8 @@ import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.SecurityTokenException;
 import com.devita.common.response.ApiResponse;
 import com.devita.common.jwt.JwtTokenProvider;
+import com.devita.domain.user.dto.UserAuthResponse;
+import com.devita.domain.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -16,43 +18,30 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/auth")
 public class AuthController {
 
-    private final JwtTokenProvider jwtTokenProvider;
+    private final AuthService authService;
 
 
-    @PostMapping("/access")
-    public ResponseEntity<ApiResponse<String>> sendAccessToken(@CookieValue("refreshToken") String refreshToken) {
-        try {
-            Long userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
-            String newAccessToken = jwtTokenProvider.validateRefreshToken(refreshToken, userId);
-            log.debug(newAccessToken);
+    @PostMapping("/user/info")
+    public ResponseEntity<ApiResponse<UserAuthResponse>> sendUserInitData(@CookieValue("refreshToken") String refreshToken) {
+        UserAuthResponse response = authService.refreshUserAuth(refreshToken);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer " + newAccessToken);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + response.getAccessToken());
 
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(ApiResponse.success(newAccessToken));
-            } catch (Exception e) {
-            log.error("token update failed: {}", e.getMessage());
-            throw new SecurityTokenException(ErrorCode.INTERNAL_TOKEN_SERVER_ERROR);
-        }
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(ApiResponse.success(response));
     }
 
     @PostMapping("/reissue")
     public ResponseEntity<ApiResponse<String>> refreshAccessToken(@CookieValue("refreshToken") String refreshToken) {
-        try {
-            Long userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
-            String newAccessToken = jwtTokenProvider.validateRefreshToken(refreshToken, userId);
+        UserAuthResponse response = authService.refreshUserAuth(refreshToken);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.add("Authorization", "Bearer " + newAccessToken);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + response.getAccessToken());
 
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(ApiResponse.success(newAccessToken));
-        } catch (Exception e) {
-            log.error("token update failed: {}", e.getMessage());
-            throw new SecurityTokenException(ErrorCode.INTERNAL_TOKEN_SERVER_ERROR);
-        }
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(ApiResponse.success(response.getAccessToken()));
     }
 }
