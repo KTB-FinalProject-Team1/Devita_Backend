@@ -2,7 +2,7 @@ package com.devita.domain.todo.controller;
 
 import com.devita.common.response.ApiResponse;
 import com.devita.domain.todo.dto.CalenderDTO;
-import com.devita.domain.todo.dto.TodoRequestDto;
+import com.devita.domain.todo.dto.TodoReqDTO;
 import com.devita.domain.todo.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,16 +24,16 @@ public class TodoController {
     }
 
     @PostMapping
-    public ApiResponse<Long> addTodo(@AuthenticationPrincipal Long userId, @RequestBody TodoRequestDto todoRequestDto) {
-        System.out.println(todoRequestDto.toString());
-        Long todoId = todoService.addTodo(userId, todoRequestDto).getId();
+    public ApiResponse<Long> addTodo(@AuthenticationPrincipal Long userId, @RequestBody TodoReqDTO todoReqDTO) {
+        System.out.println(todoReqDTO.toString());
+        Long todoId = todoService.addTodo(userId, todoReqDTO).getId();
 
         return ApiResponse.success(todoId);
     }
 
     @PutMapping("/{todoId}")
-    public ApiResponse<Long> updateTodo(@AuthenticationPrincipal Long userId, @PathVariable Long todoId, @RequestBody TodoRequestDto todoRequestDto) {
-        todoService.updateTodo(userId, todoId, todoRequestDto);
+    public ApiResponse<Long> updateTodo(@AuthenticationPrincipal Long userId, @PathVariable Long todoId, @RequestBody TodoReqDTO todoReqDTO) {
+        todoService.updateTodo(userId, todoId, todoReqDTO);
 
         return ApiResponse.success(todoId);
     }

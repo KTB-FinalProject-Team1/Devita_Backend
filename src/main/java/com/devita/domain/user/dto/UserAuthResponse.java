@@ -1,6 +1,6 @@
 package com.devita.domain.user.dto;
 
-import com.devita.domain.category.dto.CategoryResDto;
+import com.devita.domain.category.dto.CategoryResDTO;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -12,5 +12,5 @@ public class UserAuthResponse {
     private String accessToken;
     private String email;
     private String nickname;
-    private List<CategoryResDto> categories;
+    private List<CategoryResDTO> categories;
 }

@@ -3,7 +3,7 @@ package com.devita.domain.category.dto;
 import lombok.Data;
 
 @Data
-public class CategoryResDto {
+public class CategoryResDTO {
     private Long id;
     private String name;
 }

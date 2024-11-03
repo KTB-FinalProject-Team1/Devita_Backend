@@ -1,7 +1,7 @@
 package com.devita.common.oauth;
 
 import com.devita.common.exception.ErrorCode;
-import com.devita.domain.category.dto.CategoryReqDto;
+import com.devita.domain.category.dto.CategoryReqDTO;
 import com.devita.domain.category.service.CategoryService;
 import com.devita.domain.user.domain.AuthProvider;
 import com.devita.domain.user.domain.User;
@@ -74,7 +74,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     private void createDefaultCategories(Long userId) {
         String[] defaultCategories = {"일반", "강제 미션", "자율 미션"};
         for (String categoryName : defaultCategories) {
-            CategoryReqDto categoryReqDto = new CategoryReqDto();
+            CategoryReqDTO categoryReqDto = new CategoryReqDTO();
             categoryReqDto.setName(categoryName);
             categoryService.createCategory(userId, categoryReqDto);
         }

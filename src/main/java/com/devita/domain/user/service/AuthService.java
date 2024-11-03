@@ -3,7 +3,7 @@ package com.devita.domain.user.service;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.SecurityTokenException;
 import com.devita.common.jwt.JwtTokenProvider;
-import com.devita.domain.category.dto.CategoryResDto;
+import com.devita.domain.category.dto.CategoryResDTO;
 import com.devita.domain.category.service.CategoryService;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.dto.UserAuthResponse;
@@ -32,7 +32,7 @@ public class AuthService {
                     .orElseThrow(() -> new SecurityTokenException(ErrorCode.USER_NOT_FOUND));
 
             // 카테고리 정보 조회
-            List<CategoryResDto> categories = categoryService.findUserCategories(userId);
+            List<CategoryResDTO> categories = categoryService.findUserCategories(userId);
 
             // 응답 데이터 생성
             return UserAuthResponse.builder()
