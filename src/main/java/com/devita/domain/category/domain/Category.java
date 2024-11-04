@@ -21,7 +21,6 @@ import java.util.List;
 public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Setter //테스트 코드용
     private Long id;
 
     @ManyToOne

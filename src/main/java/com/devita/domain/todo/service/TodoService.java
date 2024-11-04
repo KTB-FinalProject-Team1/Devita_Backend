@@ -6,7 +6,7 @@ import com.devita.common.exception.ResourceNotFoundException;
 import com.devita.domain.category.domain.Category;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.dto.CalenderDTO;
-import com.devita.domain.todo.dto.TodoRequestDto;
+import com.devita.domain.todo.dto.TodoReqDTO;
 import com.devita.domain.category.repository.CategoryRepository;
 import com.devita.domain.todo.repository.TodoRepository;
 import com.devita.domain.user.domain.User;
@@ -27,22 +27,22 @@ public class TodoService {
     private final UserRepository userRepository;
 
     // 할 일 추가
-    public Todo addTodo(Long userId, TodoRequestDto todoRequestDto) {
+    public Todo addTodo(Long userId, TodoReqDTO todoReqDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
         List<Category> c = categoryRepository.findAll();
         for (Category a : c){
             System.out.println(a.toString());
         }
-        Category category = categoryRepository.findById(todoRequestDto.getCategoryId())
+        Category category = categoryRepository.findById(todoReqDTO.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
         Todo todo = new Todo();
         todo.setUser(user);
         todo.setCategory(category);
-        todo.setTitle(todoRequestDto.getTitle());
+        todo.setTitle(todoReqDTO.getTitle());
         todo.setStatus(false);
-        todo.setDate(todoRequestDto.getDate());
+        todo.setDate(todoReqDTO.getDate());
 
         return todoRepository.save(todo);
     }
@@ -55,7 +55,7 @@ public class TodoService {
         todoRepository.delete(todo);
     }
 
-    public Todo updateTodo(Long userId, Long todoId, TodoRequestDto todoRequestDto) {
+    public Todo updateTodo(Long userId, Long todoId, TodoReqDTO todoReqDTO) {
         Todo todo = todoRepository.findById(todoId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.TODO_NOT_FOUND));  // 투두가 없으면 ResourceNotFoundException 발생
 
@@ -63,9 +63,9 @@ public class TodoService {
             throw new AccessDeniedException(ErrorCode.TODO_ACCESS_DENIED);  // userId가 일치하지 않으면 AccessDeniedException 발생
         }
 
-        todo.setCategory(categoryRepository.findById(todoRequestDto.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND)));
-        todo.setTitle(todoRequestDto.getTitle());
-        todo.setDate(todoRequestDto.getDate());
+        todo.setCategory(categoryRepository.findById(todoReqDTO.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND)));
+        todo.setTitle(todoReqDTO.getTitle());
+        todo.setDate(todoReqDTO.getDate());
 
         return todoRepository.save(todo);
     }

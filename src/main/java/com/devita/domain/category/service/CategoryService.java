@@ -4,8 +4,8 @@ import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
 import com.devita.domain.category.domain.Category;
-import com.devita.domain.category.dto.CategoryReqDto;
-import com.devita.domain.category.dto.CategoryResDto;
+import com.devita.domain.category.dto.CategoryReqDTO;
+import com.devita.domain.category.dto.CategoryResDTO;
 import com.devita.domain.category.repository.CategoryRepository;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.repository.UserRepository;
@@ -23,7 +23,7 @@ public class CategoryService {
     private final CategoryRepository categoryRepository;
 
     // 카테고리 추가
-    public Category createCategory(Long userId, CategoryReqDto categoryReqDto) {
+    public Category createCategory(Long userId, CategoryReqDTO categoryReqDto) {
         User user = userRepository.findById(userId).orElseThrow();
 
         Category category = new Category();
@@ -41,7 +41,7 @@ public class CategoryService {
         categoryRepository.delete(category);
     }
 
-    public Category updateCategory(Long userId, Long categoryId, CategoryReqDto categoryReqDto) {
+    public Category updateCategory(Long userId, Long categoryId, CategoryReqDTO categoryReqDto) {
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
@@ -54,19 +54,19 @@ public class CategoryService {
         return categoryRepository.save(category);
     }
 
-    public List<CategoryResDto> findUserCategories(Long userId) {
+    public List<CategoryResDTO> findUserCategories(Long userId) {
         List<Category> categories = categoryRepository.findByUserId(userId);
-        List<CategoryResDto> categoryResDtos = new ArrayList<>();
+        List<CategoryResDTO> categoryResDTOS = new ArrayList<>();
 
         for (Category category: categories){
-            CategoryResDto categoryResDto = new CategoryResDto();
+            CategoryResDTO categoryResDto = new CategoryResDTO();
 
             categoryResDto.setId(category.getId());
             categoryResDto.setName(category.getName());
 
-            categoryResDtos.add(categoryResDto);
+            categoryResDTOS.add(categoryResDto);
         }
 
-        return categoryResDtos;
+        return categoryResDTOS;
     }
 }

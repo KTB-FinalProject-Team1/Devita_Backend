@@ -1,9 +1,12 @@
 package com.devita.common.oauth;
 
 import com.devita.common.exception.ErrorCode;
+import com.devita.domain.category.dto.CategoryReqDTO;
+import com.devita.domain.category.service.CategoryService;
 import com.devita.domain.user.domain.AuthProvider;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -19,13 +22,12 @@ import java.util.Map;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
+    private final CategoryService categoryService;
 
-    public CustomOAuth2UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
 
     @Override
     @Transactional
@@ -50,7 +52,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
 
         User user = userRepository.findByEmail(email)
-                .orElseGet(() -> new User(email, nickname, AuthProvider.KAKAO, profileImage));
+                .orElseGet(() -> {
+                    User newUser = new User(email, nickname, AuthProvider.KAKAO, profileImage);
+                    User savedUser = userRepository.save(newUser);
+
+                    createDefaultCategories(savedUser.getId());
+
+                    return savedUser;
+                });
 
         user.updateNickname(nickname);
         userRepository.save(user);
@@ -60,5 +69,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 attributes,
                 "id"
         );
+    }
+
+    private void createDefaultCategories(Long userId) {
+        String[] defaultCategories = {"일반", "강제 미션", "자율 미션"};
+        for (String categoryName : defaultCategories) {
+            CategoryReqDTO categoryReqDto = new CategoryReqDTO();
+            categoryReqDto.setName(categoryName);
+            categoryService.createCategory(userId, categoryReqDto);
+        }
     }
 }

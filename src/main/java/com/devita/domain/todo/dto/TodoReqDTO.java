@@ -5,7 +5,7 @@ import lombok.Data;
 import java.time.LocalDate;
 
 @Data
-public class TodoRequestDto {
+public class TodoReqDTO {
     private Long categoryId;
     private String title;
     private LocalDate date;

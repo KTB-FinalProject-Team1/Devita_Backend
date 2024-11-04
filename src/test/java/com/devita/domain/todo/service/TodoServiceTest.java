@@ -5,7 +5,7 @@ import com.devita.domain.category.domain.Category;
 import com.devita.domain.category.repository.CategoryRepository;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.dto.CalenderDTO;
-import com.devita.domain.todo.dto.TodoRequestDto;
+import com.devita.domain.todo.dto.TodoReqDTO;
 import com.devita.domain.todo.repository.TodoRepository;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.repository.UserRepository;
@@ -43,7 +43,7 @@ public class TodoServiceTest {
     private User testUser;
     private Category testCategory;
     private Todo testTodo;
-    private TodoRequestDto testTodoRequestDto;
+    private TodoReqDTO testTodoReqDTO;
 
     @BeforeEach
     void setUp() {
@@ -62,10 +62,10 @@ public class TodoServiceTest {
         testTodo.setStatus(false);
         testTodo.setDate(LocalDate.now());
 
-        testTodoRequestDto = new TodoRequestDto();
-        testTodoRequestDto.setCategoryId(1L);
-        testTodoRequestDto.setTitle("Test Todo");
-        testTodoRequestDto.setDate(LocalDate.now());
+        testTodoReqDTO = new TodoReqDTO();
+        testTodoReqDTO.setCategoryId(1L);
+        testTodoReqDTO.setTitle("Test Todo");
+        testTodoReqDTO.setDate(LocalDate.now());
     }
 
     @Test
@@ -74,7 +74,7 @@ public class TodoServiceTest {
         when(categoryRepository.findById(anyLong())).thenReturn(Optional.of(testCategory));
         when(todoRepository.save(any(Todo.class))).thenReturn(testTodo);
 
-        Todo result = todoService.addTodo(1L, testTodoRequestDto);
+        Todo result = todoService.addTodo(1L, testTodoReqDTO);
 
         assertNotNull(result);
         assertEquals(testTodo.getTitle(), result.getTitle());
@@ -102,7 +102,7 @@ public class TodoServiceTest {
 
     @Test
     void updateTodo_Success() {
-        TodoRequestDto updateDto = new TodoRequestDto();
+        TodoReqDTO updateDto = new TodoReqDTO();
         updateDto.setCategoryId(1L);
         updateDto.setTitle("Updated Todo");
         updateDto.setDate(LocalDate.now());
