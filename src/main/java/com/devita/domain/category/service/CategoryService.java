@@ -26,9 +26,7 @@ public class CategoryService {
     public Category createCategory(Long userId, CategoryReqDTO categoryReqDto) {
         User user = userRepository.findById(userId).orElseThrow();
 
-        Category category = new Category();
-        category.setUser(user);
-        category.setName(categoryReqDto.getName());
+        Category category = new Category(user, categoryReqDto.getName(), categoryReqDto.getColor());
 
         return categoryRepository.save(category);
     }
@@ -50,6 +48,7 @@ public class CategoryService {
         }
 
         category.setName(categoryReqDto.getName());
+        category.setColor(categoryReqDto.getColor());
 
         return categoryRepository.save(category);
     }

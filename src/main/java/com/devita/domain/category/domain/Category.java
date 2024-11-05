@@ -28,6 +28,8 @@ public class Category {
     private User user;
 
     private String name;
+
+    private String color;
     @CreatedDate
     private String createdAt;
     @LastModifiedDate
@@ -36,9 +38,10 @@ public class Category {
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Todo> todos;
 
-    public Category(User user, String name){
+    public Category(User user, String name, String color){
         this.user = user;
         this.name = name;
+        this.color = color;
         todos = new ArrayList<>();
     }
 
