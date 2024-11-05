@@ -72,7 +72,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     private void createDefaultCategories(Long userId) {
-        String[] defaultCategories = {"일반", "강제 미션", "자율 미션"};
+        String[] defaultCategories = {"일반", "일일 미션", "자율 미션"};
         for (String categoryName : defaultCategories) {
             CategoryReqDTO categoryReqDto = new CategoryReqDTO();
             categoryReqDto.setName(categoryName);
