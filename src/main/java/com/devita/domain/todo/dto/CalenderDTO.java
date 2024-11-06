@@ -10,7 +10,7 @@ public class CalenderDTO {
     private Long todoId;
     private Long categoryId;
     private String title;
-    private String status;
+    private Boolean status;
     private LocalDate date;
 
 
@@ -19,6 +19,7 @@ public class CalenderDTO {
         dto.setTodoId(todo.getId());
         dto.setCategoryId(todo.getCategory().getId());
         dto.setTitle(todo.getTitle());
+        dto.setStatus(todo.getStatus());
         dto.setDate(todo.getDate());
 
         return dto;

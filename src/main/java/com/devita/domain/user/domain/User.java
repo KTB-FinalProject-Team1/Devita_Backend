@@ -11,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,6 +41,15 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> categories;
 
+    @ElementCollection
+    @CollectionTable(
+            name = "user_preferred_categories",
+            joinColumns = @JoinColumn(name = "user_id")
+    )
+    @Enumerated(EnumType.STRING)
+    @Column(name = "category_name")
+    private List<PreferredCategory> preferredCategories = new ArrayList<>();
+
     private String profileImage;
 
     @CreatedDate
@@ -59,5 +69,10 @@ public class User {
 
     public void updateNickname(String nickname) {
         this.nickname = nickname;
+    }
+
+    public void updatePreferredCategories(List<PreferredCategory> categories) {
+        this.preferredCategories.clear();
+        this.preferredCategories.addAll(categories);
     }
 }
