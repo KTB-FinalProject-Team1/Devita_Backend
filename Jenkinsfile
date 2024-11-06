@@ -34,7 +34,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    git branch: 'develop', url: 'https://github.com/KTB-FinalProject-Team1/Devita_Backend', credentialsId: "githubAccessToken"
+                    git branch: 'test', url: 'https://github.com/KTB-FinalProject-Team1/Devita_Backend', credentialsId: "githubAccessToken"
                 }
             }
         }
@@ -79,44 +79,11 @@ pipeline {
                 }
             }
         }
-        stage('Start EC2 Instance and Deploy') {
+        stage('Start Deploy') {
             steps {
                 script {
-                    // EC2 인스턴스 시작
-                    sh '''
-                    export AWS_ACCESS_KEY_ID=$(echo $AWS_CREDENTIALS | cut -d':' -f1)
-                    export AWS_SECRET_ACCESS_KEY=$(echo $AWS_CREDENTIALS | cut -d':' -f2)
-                    aws ec2 start-instances --instance-ids $INSTANCE_ID --region $AWS_REGION
-                    aws ec2 wait instance-running --instance-ids $INSTANCE_ID --region $AWS_REGION
-                    '''
+                    build job: 'cd_pipeline'
                     
-                    // SSH로 백엔드 인스턴스에 접속하고 환경 변수를 전달
-                    sshagent(['back_PEM']) {
-                        sh '''
-                        ssh -t -o StrictHostKeyChecking=no ubuntu@10.0.1.44 << EOF
-                        export AWS_REGION='$AWS_REGION'
-                        export ECR_REGISTRY='$ECR_REGISTRY'
-                        export ECR_REPO_NAME='$ECR_REPO_NAME'
-                        export IMAGE_TAG='$IMAGE_TAG'
-                        export AWS_ACCESS_KEY_ID=\$(echo "$AWS_CREDENTIALS" | cut -d':' -f1)
-                        export AWS_SECRET_ACCESS_KEY=\$(echo "$AWS_CREDENTIALS" | cut -d':' -f2)
-
-                        aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
-
-                        docker ps -q --filter "name=devita_back" | xargs -r docker stop
-                        # 현재 실행 중이거나 종료된 컨테이너가 있는 경우만 삭제
-                        docker ps -qa | xargs -r docker rm
-                        # 현재 존재하는 이미지를 삭제할 때만 삭제
-                        docker images -q | xargs -r docker rmi
-
-                        docker pull $ECR_REGISTRY/$ECR_REPO_NAME:$IMAGE_TAG
-                        docker images
-
-                        # 기존에 실행 중이던 컨테이너가 있다면 삭제 후 새로운 컨테이너 실행
-                        docker run -d --name devita_back -p 8080:8080 $ECR_REGISTRY/$ECR_REPO_NAME:$IMAGE_TAG
-                        docker ps -a
-                        '''
-                    }
                 }
             }
         }
