@@ -29,6 +29,7 @@ RUN ./gradlew build --no-daemon || exit 0
 # Step 8: 소스 코드 복사
 COPY src ./src
 
+
 COPY test ./test
 
 # Step 9: 프로젝트 빌드
