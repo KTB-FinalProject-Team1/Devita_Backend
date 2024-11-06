@@ -62,6 +62,7 @@ public class CategoryService {
 
             categoryResDto.setId(category.getId());
             categoryResDto.setName(category.getName());
+            category.setColor(category.getColor());
 
             categoryResDTOS.add(categoryResDto);
         }

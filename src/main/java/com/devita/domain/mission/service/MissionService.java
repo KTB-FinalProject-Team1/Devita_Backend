@@ -20,7 +20,7 @@ public class MissionService {
 
     public DailyMissionAiResDTO requestDailyMission(Long userId, String category) {
         // AI 서버 호출 부분 주석 처리
-        // DailyMissionAiReqDTO request = new DailyMissionAiReqDTO(userId, category);
+        // DailyMissionAiReqDTO request = new DailyMissionAiReqDTO(userId, categp);
         // return restTemplate.postForObject(aiAddress + DAILY_MISSION_API, request, MissionAiResDTO.class);
 
         // 테스트용 임의 데이터 반환
