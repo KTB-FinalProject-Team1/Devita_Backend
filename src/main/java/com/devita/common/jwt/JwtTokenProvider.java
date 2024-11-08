@@ -91,6 +91,7 @@ public class JwtTokenProvider {
     // 액세스 토큰 검증
     public boolean validateAccessToken(String token) {
         try {
+            log.info("액세스 토큰 검증을 시작합니다: " + token);
             Jwts.parser().setSigningKey(accessTokenSecret).parseClaimsJws(token);
             return true;
         } catch (JwtException | IllegalArgumentException e) {

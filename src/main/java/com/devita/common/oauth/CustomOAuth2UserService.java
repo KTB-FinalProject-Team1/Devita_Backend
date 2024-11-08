@@ -64,6 +64,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         user.updateNickname(nickname);
         userRepository.save(user);
 
+        log.info("유저 로그인 성공!");
         return new DefaultOAuth2User(
                 Collections.singleton(new SimpleGrantedAuthority("USER")),
                 attributes,

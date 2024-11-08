@@ -29,13 +29,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String requestURI = request.getRequestURI();
 
         if (isRequest(requestURI)) {
+
+            log.info(requestURI + ": 액세스 토큰이 필요없는 작업입니다.");
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
+            log.info(requestURI + ": 액세스 토큰이 필요한 작업입니다.");
             String token = resolveToken(request);
-
+            log.info("액세스 토큰: " + token);
             // 토큰 유효성 검증
             if (!jwtTokenProvider.validateAccessToken(token)) {
                 throw new SecurityTokenException(ErrorCode.INVALID_TOKEN);
@@ -67,6 +70,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     // Authorization 헤더에서 JWT 토큰을 추출
     private String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
+        log.info("액세스 토큰 추출 시작: " + bearerToken);
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }

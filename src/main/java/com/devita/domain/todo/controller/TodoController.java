@@ -5,6 +5,7 @@ import com.devita.domain.todo.dto.CalenderDTO;
 import com.devita.domain.todo.dto.TodoReqDTO;
 import com.devita.domain.todo.service.TodoService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,19 +14,20 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/todo")
 @RequiredArgsConstructor
+@Slf4j
 public class TodoController {
 
     private final TodoService todoService;
 
     @GetMapping("/calendar")
     public ApiResponse<List<CalenderDTO>> getCalendar(@AuthenticationPrincipal Long userId, @RequestParam String viewType) {
+        log.info("유저 정보를 성공적으로 받아와서 캘린더를 호출합니다.");
         List<CalenderDTO> todos = todoService.getCalendar(userId, viewType);
         return ApiResponse.success(todos);
     }
 
     @PostMapping
     public ApiResponse<Long> addTodo(@AuthenticationPrincipal Long userId, @RequestBody TodoReqDTO todoReqDTO) {
-        System.out.println(todoReqDTO.toString());
         Long todoId = todoService.addTodo(userId, todoReqDTO).getId();
 
         return ApiResponse.success(todoId);

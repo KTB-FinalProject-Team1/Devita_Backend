@@ -30,10 +30,7 @@ public class TodoService {
     public Todo addTodo(Long userId, TodoReqDTO todoReqDTO) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
-        List<Category> c = categoryRepository.findAll();
-        for (Category a : c){
-            System.out.println(a.toString());
-        }
+
         Category category = categoryRepository.findById(todoReqDTO.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
