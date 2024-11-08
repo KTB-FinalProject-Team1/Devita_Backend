@@ -24,9 +24,10 @@ public class AuthService {
 
     public UserAuthResponse refreshUserAuth(String refreshToken) {
         try {
+            log.info("액세스 토큰을 생성합니다.");
             Long userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
             String newAccessToken = jwtTokenProvider.validateRefreshToken(refreshToken, userId);
-
+            log.info("액세스 토큰: " + newAccessToken);
             // 사용자 정보 조회
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new SecurityTokenException(ErrorCode.USER_NOT_FOUND));
