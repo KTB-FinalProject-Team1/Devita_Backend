@@ -34,6 +34,7 @@ public class JwtTokenProvider {
 
     // 액세스 토큰 생성
     public String createAccessToken(Long userId) {
+
         return createToken(userId, accessTokenValidityInMilliseconds, accessTokenSecret);
     }
 
