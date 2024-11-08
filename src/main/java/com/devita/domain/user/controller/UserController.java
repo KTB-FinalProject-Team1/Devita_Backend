@@ -1,11 +1,10 @@
-package com.devita.domain.user.api;
+package com.devita.domain.user.controller;
 
 import com.devita.common.response.ApiResponse;
 import com.devita.domain.user.dto.PreferredCategoryRequest;
 import com.devita.domain.user.dto.PreferredCategoryResponse;
 import com.devita.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 

@@ -57,7 +57,7 @@ public class CategoryService {
         List<Category> categories = categoryRepository.findByUserId(userId);
         List<CategoryResDTO> categoryResDTOS = new ArrayList<>();
 
-        for (Category category: categories){
+        for (Category category : categories){
             CategoryResDTO categoryResDto = new CategoryResDTO();
 
             categoryResDto.setId(category.getId());

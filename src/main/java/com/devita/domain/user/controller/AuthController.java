@@ -1,9 +1,6 @@
-package com.devita.domain.user.api;
+package com.devita.domain.user.controller;
 
-import com.devita.common.exception.ErrorCode;
-import com.devita.common.exception.SecurityTokenException;
 import com.devita.common.response.ApiResponse;
-import com.devita.common.jwt.JwtTokenProvider;
 import com.devita.domain.user.dto.UserAuthResponse;
 import com.devita.domain.user.service.AuthService;
 import lombok.RequiredArgsConstructor;
