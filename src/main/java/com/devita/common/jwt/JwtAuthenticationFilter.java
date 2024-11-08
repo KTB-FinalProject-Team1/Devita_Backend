@@ -31,6 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (isRequest(requestURI)) {
 
             log.info(requestURI + ": 액세스 토큰이 필요없는 작업입니다.");
+            System.out.println(request);
+            System.out.println(response);
             filterChain.doFilter(request, response);
             return;
         }
