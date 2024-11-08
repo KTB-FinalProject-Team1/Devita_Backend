@@ -4,6 +4,7 @@ package com.devita.domain.mission.controller;
 import com.devita.common.response.ApiResponse;
 import com.devita.domain.mission.dto.ai.MissionAiResDTO;
 import com.devita.domain.mission.dto.client.FreeMissionReqDTO;
+import com.devita.domain.mission.dto.client.FreeSaveReqDTO;
 import com.devita.domain.mission.service.MissionService;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.repository.TodoRepository;
@@ -34,5 +35,12 @@ public class MissionController {
         List<MissionAiResDTO> freeMissions = missionService.requestFreeMission(userId, freeMissionReqDTO.getSubCategory());
 
         return ApiResponse.success(freeMissions);
+    }
+
+    @PostMapping("/free/save")
+    public ApiResponse<Long> saveFreeMission(@AuthenticationPrincipal Long userId, @RequestBody FreeSaveReqDTO freeSaveReqDTO){
+        Long todoId = missionService.saveFreeMission(userId, freeSaveReqDTO).getId();
+
+        return ApiResponse.success(todoId);
     }
 }

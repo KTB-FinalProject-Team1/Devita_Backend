@@ -2,12 +2,14 @@ package com.devita.common.jwt;
 
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.SecurityTokenException;
+import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
@@ -16,6 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -31,8 +34,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (isRequest(requestURI)) {
 
             log.info(requestURI + ": 액세스 토큰이 필요없는 작업입니다.");
-            System.out.println(request);
-            System.out.println(response);
+            // 쿠키 배열에서 리프레시 토큰을 찾기
+            if (request.getCookies() != null) {
+                for (Cookie cookie : request.getCookies()) {
+                    if ("refreshToken".equals(cookie.getName())) {
+                        String refreshToken = cookie.getValue();
+                        System.out.println("리프레시 토큰: " + refreshToken);
+                        break;
+                    }
+                }
+            } else {
+                System.out.println("쿠키가 없습니다.");
+            }
+
             filterChain.doFilter(request, response);
             return;
         }
