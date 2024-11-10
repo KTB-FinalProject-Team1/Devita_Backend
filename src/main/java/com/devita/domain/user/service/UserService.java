@@ -2,9 +2,12 @@ package com.devita.domain.user.service;
 
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
+import com.devita.domain.character.domain.RewardEntity;
+import com.devita.domain.character.repository.RewardRepository;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.dto.PreferredCategoryRequest;
 import com.devita.domain.user.dto.PreferredCategoryResponse;
+import com.devita.domain.user.dto.UserInfoResponse;
 import com.devita.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final RewardRepository rewardRepository;
 
     @Transactional
     public void updatePreferredCategories(Long userId, PreferredCategoryRequest request) {
@@ -30,5 +34,14 @@ public class UserService {
     private User getUserById(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
+    }
+
+    @Transactional(readOnly = true)
+    public UserInfoResponse getUserInfo(Long userId) {
+        User user = getUserById(userId);
+        RewardEntity reward = rewardRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.REWARD_NOT_FOUND));
+
+        return new UserInfoResponse(user, reward);
     }
 }
