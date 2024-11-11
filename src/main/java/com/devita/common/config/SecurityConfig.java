@@ -34,6 +34,9 @@ public class SecurityConfig {
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LogoutSuccessHandler oAuth2LogoutSuccessHandler;
 
+    @Value("${cors.allowed-origins}")
+    private String corsOrigin;
+
 
     private static final String[] WHITE_LIST_URL = {
             "/api/v1/auth/**",
@@ -93,7 +96,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOriginPatterns(List.of("http://3.37.229.132:3000"));
+        configuration.setAllowedOriginPatterns(List.of(corsOrigin));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setMaxAge(3600L);
