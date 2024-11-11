@@ -75,7 +75,6 @@ public class JwtTokenProvider {
     // 리프레시 토큰 쿠키 생성 및 설정
     private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
         ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-                .domain("3.37.229.132")
                 .maxAge((int) (refreshTokenValidityInMilliseconds / 1000))
                 .sameSite("None")
                 .secure(true)

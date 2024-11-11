@@ -3,6 +3,7 @@ package com.devita.domain.mission.controller;
 
 import com.devita.common.response.ApiResponse;
 import com.devita.domain.mission.dto.ai.MissionAiResDTO;
+import com.devita.domain.mission.dto.client.DailyMissionResDTO;
 import com.devita.domain.mission.dto.client.FreeMissionReqDTO;
 import com.devita.domain.mission.dto.client.FreeSaveReqDTO;
 import com.devita.domain.mission.service.MissionService;
@@ -23,10 +24,10 @@ public class MissionController {
     private final TodoRepository todoRepository;
 
     @GetMapping("/daily")
-    public ApiResponse<Todo> getDailyMission(@AuthenticationPrincipal Long userId){
+    public ApiResponse<DailyMissionResDTO> getDailyMission(@AuthenticationPrincipal Long userId){
         Todo dailyMission = todoRepository.findTodosByUserIdAndCategoryNameAndDate(userId, "일일 미션", LocalDate.now());
 
-        return ApiResponse.success(dailyMission);
+        return ApiResponse.success(new DailyMissionResDTO(dailyMission.getId(), dailyMission.getTitle()));
 
     }
 

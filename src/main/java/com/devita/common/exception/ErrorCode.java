@@ -15,6 +15,7 @@ public enum ErrorCode {
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "접근이 거부되었습니다."),
     TODO_ACCESS_DENIED(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "해당 사용자에게 할 일 접근 권한이 없습니다.."),
     CATEGORY_ACCESS_DENIED(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "해당 사용자에게 카테고리 접근 권한이 없습니다.."),
+    INSUFFICIENT_SUPPLEMENTS(HttpStatus.FORBIDDEN, "INSUFFICIENT_SUPPLEMENTS", "해당 사용자의 영양제가 부족하여 사용할 수 없습니다."),
 
     // 404 Not Found
     RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", "리소스를 찾을 수 없습니다."),

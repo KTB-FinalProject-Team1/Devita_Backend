@@ -1,5 +1,8 @@
 package com.devita.domain.character.service;
 
+import com.devita.common.exception.AccessDeniedException;
+import com.devita.common.exception.ErrorCode;
+import com.devita.common.exception.ResourceNotFoundException;
 import com.devita.domain.character.domain.RewardEntity;
 import com.devita.domain.character.enums.TodoType;
 import com.devita.domain.character.domain.Reward;
@@ -22,6 +25,11 @@ import java.util.concurrent.TimeUnit;
 public class RewardService {
     private final RedisTemplate<String, Integer> redisTemplate;
     private final RewardRepository rewardRepository;
+
+    private static final int USER_TODO_LIMIT = 300000;
+    private static final int DAILY_MISSION_LIMIT = 300000;
+    private static final int FREE_MISSION_LIMIT = 300000;
+    private static final int NUTRITION_THRESHOLD = 0;
 
     // 보상 지급 프로세스
     @Transactional
@@ -71,9 +79,9 @@ public class RewardService {
         }
 
         return count < switch (todoType) {
-            case USER_TODO -> 10;
-            case DAILY_MISSION -> 1;
-            case FREE_MISSION -> 3;
+            case USER_TODO -> USER_TODO_LIMIT;
+            case DAILY_MISSION -> DAILY_MISSION_LIMIT;
+            case FREE_MISSION -> FREE_MISSION_LIMIT;
         };
     }
 
@@ -89,4 +97,15 @@ public class RewardService {
         return ChronoUnit.SECONDS.between(now, midnight);
     }
 
+    public Long useNutrition(Long userId){
+        RewardEntity rewardEntity = rewardRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        if (rewardEntity.getNutrition() <= NUTRITION_THRESHOLD){
+            throw new AccessDeniedException(ErrorCode.INSUFFICIENT_SUPPLEMENTS);
+        }
+        rewardEntity.useNutrition();
+
+        return rewardEntity.getId();
+    }
 }
