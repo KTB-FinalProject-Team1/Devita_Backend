@@ -31,6 +31,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
 
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            log.info("옵션");
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         if (isRequest(requestURI)) {
 
             log.info(requestURI + ": 액세스 토큰이 필요없는 작업입니다.");
