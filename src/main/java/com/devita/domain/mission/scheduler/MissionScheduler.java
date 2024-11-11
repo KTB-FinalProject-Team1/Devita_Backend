@@ -5,7 +5,6 @@ import com.devita.common.exception.ResourceNotFoundException;
 import com.devita.domain.category.domain.Category;
 import com.devita.domain.category.repository.CategoryRepository;
 import com.devita.domain.mission.dto.ai.DailyMissionAiResDTO;
-import com.devita.domain.mission.dto.ai.MissionAiResDTO;
 import com.devita.domain.mission.service.MissionService;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.repository.TodoRepository;
@@ -36,9 +35,9 @@ public class MissionScheduler {
     public void createDailyMissions() {
         log.info("미션 생성 시작 시간: {}", LocalDateTime.now());
 
-        List<User> users = userRepository.findAll();
+        List<User> userEntities = userRepository.findAll();
 
-        for (User user : users) {
+        for (User user : userEntities) {
             try {
                 // 해당 사용자의 '일일 미션' 카테고리 찾기
                 Category dailyMissionCategory = categoryRepository.findByUserIdAndName(user.getId(), "일일 미션")

@@ -36,7 +36,7 @@ public class User {
     private AuthProvider provider;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Todo> todos;
+    private List<Todo> todoEntities;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> categories;

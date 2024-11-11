@@ -3,6 +3,8 @@ package com.devita.common.oauth;
 import com.devita.common.exception.ErrorCode;
 import com.devita.domain.category.dto.CategoryReqDTO;
 import com.devita.domain.category.service.CategoryService;
+import com.devita.domain.character.domain.RewardEntity;
+import com.devita.domain.character.repository.RewardRepository;
 import com.devita.domain.user.domain.AuthProvider;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.repository.UserRepository;
@@ -27,6 +29,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserRepository userRepository;
     private final CategoryService categoryService;
+    private final RewardRepository rewardRepository;
 
 
     @Override
@@ -55,6 +58,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .orElseGet(() -> {
                     User newUser = new User(email, nickname, AuthProvider.KAKAO, profileImage);
                     User savedUser = userRepository.save(newUser);
+
+                    // 새 유저의 Reward 엔티티 생성
+                    RewardEntity reward = new RewardEntity(savedUser);
+                    rewardRepository.save(reward);
 
                     createDefaultCategories(savedUser.getId());
 

@@ -48,8 +48,8 @@ public class TodoController {
     }
 
     @PutMapping("/{todoId}/toggle")
-    public ApiResponse<Void> toggleTodoCompletion(@PathVariable Long todoId) {
-        todoService.toggleTodo(todoId);
+    public ApiResponse<Void> toggleTodoCompletion(@AuthenticationPrincipal Long userId, @PathVariable Long todoId) {
+        todoService.toggleTodo(userId, todoId);
 
         return ApiResponse.success(null);
     }

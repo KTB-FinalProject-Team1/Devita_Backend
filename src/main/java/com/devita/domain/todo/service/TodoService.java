@@ -4,6 +4,7 @@ import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
 import com.devita.domain.category.domain.Category;
+import com.devita.domain.character.service.RewardService;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.dto.CalenderDTO;
 import com.devita.domain.todo.dto.TodoReqDTO;
@@ -12,19 +13,23 @@ import com.devita.domain.todo.repository.TodoRepository;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class TodoService {
 
     private final TodoRepository todoRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
+    private final RewardService rewardService;
 
     // 할 일 추가
     public Todo addTodo(Long userId, TodoReqDTO todoReqDTO) {
@@ -67,11 +72,24 @@ public class TodoService {
         return todoRepository.save(todo);
     }
 
-    // 할 일 완료 토글
-    public void toggleTodo(Long todoId) {
-        Todo todo = todoRepository.findById(todoId).orElseThrow();
+    @Transactional
+    public void toggleTodo(Long userId, Long todoId) {
+        Todo todo = todoRepository.findById(todoId)
+                .filter(t -> t.getUser().getId().equals(userId))
+                .orElseThrow(() -> new AccessDeniedException(ErrorCode.TODO_ACCESS_DENIED));
+
+        // 완료 상태가 false -> true로 변경될 때만 보상 지급
         todo.toggleSatatus();
         todoRepository.save(todo);
+
+        if (todo.getStatus()) {
+            try {
+                rewardService.processReward(todo.getUser(), todo);
+            } catch (IllegalStateException e) {
+                // 보상 지급 실패 시 로깅하되, 할 일 완료 상태는 유지
+                log.warn("보상 지급 실패 {}: {}", todoId, e.getMessage());
+            }
+        }
     }
 
     public List<CalenderDTO> getCalendar(Long userId, String viewType) {
@@ -95,8 +113,8 @@ public class TodoService {
                 throw new IllegalArgumentException("Invalid viewType. Use 'daily', 'weekly', or 'monthly'.");
         }
 
-        List<Todo> todos = todoRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
+        List<Todo> todoEntities = todoRepository.findByUserIdAndDateBetween(userId, startDate, endDate);
 
-        return todos.stream().map(CalenderDTO::fromEntity).toList();
+        return todoEntities.stream().map(CalenderDTO::fromEntity).toList();
     }
 }
