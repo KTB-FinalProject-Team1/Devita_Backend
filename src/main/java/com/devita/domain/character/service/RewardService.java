@@ -1,5 +1,8 @@
 package com.devita.domain.character.service;
 
+import com.devita.common.exception.AccessDeniedException;
+import com.devita.common.exception.ErrorCode;
+import com.devita.common.exception.ResourceNotFoundException;
 import com.devita.domain.character.domain.RewardEntity;
 import com.devita.domain.character.enums.TodoType;
 import com.devita.domain.character.domain.Reward;
@@ -89,4 +92,15 @@ public class RewardService {
         return ChronoUnit.SECONDS.between(now, midnight);
     }
 
+    public Long useNutrition(Long userId){
+        RewardEntity rewardEntity = rewardRepository.findByUserId(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
+
+        if (rewardEntity.getNutrition() <= 0){
+            throw new AccessDeniedException(ErrorCode.INSUFFICIENT_SUPPLEMENTS);
+        }
+        rewardEntity.useNutrition();
+
+        return rewardEntity.getId();
+    }
 }
