@@ -31,6 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String requestURI = request.getRequestURI();
 
+        log.info(requestURI);
+
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             log.info("옵션");
             filterChain.doFilter(request, response);
@@ -45,12 +47,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 for (Cookie cookie : request.getCookies()) {
                     if ("refreshToken".equals(cookie.getName())) {
                         String refreshToken = cookie.getValue();
-                        System.out.println("리프레시 토큰: " + refreshToken);
+                        log.info("리프레시 토큰: " + refreshToken);
                         break;
                     }
                 }
             } else {
-                System.out.println("쿠키가 없습니다.");
+                log.info("쿠키가 없습니다.");
             }
 
             filterChain.doFilter(request, response);

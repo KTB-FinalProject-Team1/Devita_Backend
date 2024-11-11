@@ -32,6 +32,9 @@ public class JwtTokenProvider {
     @Value("${jwt.expiration.refresh}")
     private long refreshTokenValidityInMilliseconds;
 
+    @Value("${cors.allowed-origins}")
+    private String allowedOrigin;
+
     // 액세스 토큰 생성
     public String createAccessToken(Long userId) {
 
@@ -74,9 +77,12 @@ public class JwtTokenProvider {
     private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true);
-//        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setSecure(true);
+        refreshTokenCookie.setDomain(allowedOrigin);
+        refreshTokenCookie.setAttribute("SameSite", "None");
         refreshTokenCookie.setPath("/");
         refreshTokenCookie.setMaxAge((int) (refreshTokenValidityInMilliseconds / 1000));
+
         response.addCookie(refreshTokenCookie);
     }
 

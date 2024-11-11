@@ -7,6 +7,10 @@ plugins {
 group = 'com.devita'
 version = '0.0.1-SNAPSHOT'
 
+tasks.named('bootJar') {
+	mainClass.set('com.devita.DevitaApplication')
+}
+
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(17)
