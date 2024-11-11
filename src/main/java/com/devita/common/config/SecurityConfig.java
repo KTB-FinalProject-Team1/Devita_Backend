@@ -93,7 +93,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowCredentials(true);
-        configuration.setAllowedOriginPatterns(List.of("*")); // Allow all origins or specify your allowed origins
+        configuration.setAllowedOriginPatterns(List.of("http://3.37.229.132:3000")); // Allow all origins or specify your allowed origins
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*")); // Allow all headers
         configuration.setExposedHeaders(List.of("Authorization", "refreshToken")); // Expose headers if needed
