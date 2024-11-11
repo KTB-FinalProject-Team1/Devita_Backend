@@ -9,6 +9,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -72,12 +74,15 @@ public class JwtTokenProvider {
 
     // 리프레시 토큰 쿠키 생성 및 설정
     private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
-        refreshTokenCookie.setHttpOnly(true);
-        refreshTokenCookie.setPath("/");
-        refreshTokenCookie.setMaxAge((int) (refreshTokenValidityInMilliseconds / 1000));
+        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
+                .domain("3.37.229.132")
+                .maxAge((int) (refreshTokenValidityInMilliseconds / 1000))
+                .sameSite("None")
+                .secure(true)
+                .path("/")
+                .build();
 
-        response.addCookie(refreshTokenCookie);
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
 
