@@ -10,6 +10,7 @@ import com.devita.domain.mission.service.MissionService;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.repository.TodoRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/mission")
+@Slf4j
 public class MissionController {
     private final MissionService missionService;
     private final TodoRepository todoRepository;
@@ -27,7 +29,10 @@ public class MissionController {
     public ApiResponse<DailyMissionResDTO> getDailyMission(@AuthenticationPrincipal Long userId){
         Todo dailyMission = todoRepository.findTodosByUserIdAndCategoryNameAndDate(userId, "일일 미션", LocalDate.now());
 
-        return ApiResponse.success(new DailyMissionResDTO(dailyMission.getId(), dailyMission.getTitle()));
+        DailyMissionResDTO dailyMissionResDTO = new DailyMissionResDTO(dailyMission.getId(), dailyMission.getTitle());
+
+        log.info(dailyMissionResDTO.toString());
+        return ApiResponse.success(dailyMissionResDTO);
 
     }
 
