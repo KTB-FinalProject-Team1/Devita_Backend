@@ -8,5 +8,5 @@ import java.util.List;
 @AllArgsConstructor
 public class DailyMissionAiReqDTO {
     private Long userId; // 미션을 요청하는 유저의 ID
-    private List<String> categies;    // 미션 카테고리 (예: C++, Java)
+    private List<String> categories;    // 미션 카테고리 (예: C++, Java)
 }

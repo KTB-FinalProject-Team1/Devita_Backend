@@ -44,7 +44,7 @@ public class MissionScheduler {
                         .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
                 // AI 서버에 Daily Mission 요청
-                DailyMissionAiResDTO missionResponse = missionService.requestDailyMission(user.getId(), "Java");
+                DailyMissionAiResDTO missionResponse = missionService.requestDailyMission(user.getId(), List.of("Java"));
 
                 // 미션 생성
                 Todo mission = new Todo();
