@@ -92,7 +92,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private void createDefaultCategories(Long userId) {
         String[] defaultCategories = {"일반", "일일 미션", "자율 미션"};
-        String[] defaultColors = {"#000000", "#FFC0CB", "#87CEEB"}; // 검정, 분홍, 하늘
+        String[] defaultColors = {"#6DC2FF", "#086BFF", "#7DB1FF"};
 
         for (int i = 0; i < defaultCategories.length; i++) {
             CategoryReqDTO categoryReqDto = new CategoryReqDTO();

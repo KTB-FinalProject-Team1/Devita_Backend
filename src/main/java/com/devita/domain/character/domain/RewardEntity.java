@@ -45,7 +45,7 @@ public class RewardEntity {
     }
 
     public void useNutrition(){
-        this.experience += 10;
+        this.experience += 30;
         this.nutrition -= 1;
     }
 }
