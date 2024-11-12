@@ -11,6 +11,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
+@ToString
 public class Todo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
