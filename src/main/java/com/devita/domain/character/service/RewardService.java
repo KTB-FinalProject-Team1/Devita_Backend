@@ -97,6 +97,7 @@ public class RewardService {
         return ChronoUnit.SECONDS.between(now, midnight);
     }
 
+    @Transactional
     public Long useNutrition(Long userId){
         RewardEntity rewardEntity = rewardRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
@@ -104,6 +105,7 @@ public class RewardService {
         if (rewardEntity.getNutrition() <= NUTRITION_THRESHOLD){
             throw new AccessDeniedException(ErrorCode.INSUFFICIENT_SUPPLEMENTS);
         }
+
         rewardEntity.useNutrition();
 
         return rewardEntity.getId();
