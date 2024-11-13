@@ -20,6 +20,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -29,6 +30,8 @@ import java.util.Objects;
 @Slf4j
 @Transactional
 public class MissionService {
+
+    private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
     private final RestTemplate restTemplate;
     private final TodoRepository todoRepository;
@@ -86,7 +89,7 @@ public class MissionService {
         Category category = categoryRepository.findByUserIdAndName(userId, FREE_MISSION)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        Todo todo = new Todo(user, category, freeSaveReqDTO.getMissionTitle(), LocalDate.now());
+        Todo todo = new Todo(user, category, freeSaveReqDTO.getMissionTitle(), LocalDate.now(KOREA_ZONE));
 
         return todoRepository.save(todo);
     }
