@@ -50,7 +50,6 @@ public class SecurityConfig {
             "/webjars/**",
             "/oauth2/**",
             "/api/v1/auth/access",
-            "/api/login/oauth2/code/**"
     };
 
     @Bean
