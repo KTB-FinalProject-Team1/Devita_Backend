@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -48,7 +49,8 @@ public class SecurityConfig {
             "/api-docs/**",
             "/webjars/**",
             "/oauth2/**",
-            "/api/v1/auth/access"
+            "/api/v1/auth/access",
+            "/api/login/oauth2/code/**"
     };
 
     @Bean
