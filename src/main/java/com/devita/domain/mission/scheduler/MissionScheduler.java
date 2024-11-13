@@ -18,6 +18,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 @Configuration
@@ -31,7 +32,9 @@ public class MissionScheduler {
     private final TodoRepository todoRepository;
     private final MissionService missionService;
 
-    @Scheduled(cron = "0 8 16 * * *") // 매일 오전 9시
+    private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
+
+    @Scheduled(cron = "0 5 21 * * *", zone = "Asia/Seoul")
     public void createDailyMissions() {
         log.info("미션 생성 시작 시간: {}", LocalDateTime.now());
 
@@ -52,7 +55,7 @@ public class MissionScheduler {
                 mission.setCategory(dailyMissionCategory);
                 mission.setTitle(missionResponse.getMissionTitle());
                 mission.setStatus(false);
-                mission.setDate(LocalDate.now());
+                mission.setDate(LocalDate.now(KOREA_ZONE));
 
                 todoRepository.save(mission);
                 log.info("사용자 {}의 미션 생성 완료: {}", user.getId(), missionResponse.getMissionTitle());
