@@ -9,7 +9,6 @@ import com.devita.domain.category.service.CategoryService;
 import com.devita.domain.character.domain.RewardEntity;
 import com.devita.domain.character.repository.RewardRepository;
 import com.devita.domain.mission.dto.ai.DailyMissionAiResDTO;
-import com.devita.domain.mission.service.MissionService;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.repository.TodoRepository;
 import com.devita.domain.user.domain.AuthProvider;
@@ -27,8 +26,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Collections;
 import java.util.Map;
+
 
 @Service
 @Slf4j
@@ -41,6 +42,8 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final CategoryRepository categoryRepository;
     private final TodoRepository todoRepository;
+
+    private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
     @Override
     @Transactional
@@ -104,9 +107,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String[] defaultColors = {"#6DC2FF", "#086BFF", "#7DB1FF"};
 
         for (int i = 0; i < defaultCategories.length; i++) {
-            CategoryReqDTO categoryReqDto = new CategoryReqDTO();
-            categoryReqDto.setName(defaultCategories[i]);
-            categoryReqDto.setColor(defaultColors[i]);
+            CategoryReqDTO categoryReqDto = CategoryReqDTO.builder()
+                    .name(defaultCategories[i])
+                    .color(defaultColors[i])
+                    .build();
+
             categoryService.createCategory(userId, categoryReqDto);
         }
     }
@@ -131,12 +136,14 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             DailyMissionAiResDTO missionResponse = new DailyMissionAiResDTO("다형성 공부하기");
 
             // 미션 생성
-            Todo mission = new Todo();
-            mission.setUser(user);
-            mission.setCategory(dailyMissionCategory);
-            mission.setTitle(missionResponse.getMissionTitle());
-            mission.setStatus(false);
-            mission.setDate(LocalDate.now());
+            Todo mission = Todo.builder()
+                    .user(user)
+                    .category(dailyMissionCategory)
+                    .title(missionResponse.getMissionTitle())
+                    .status(false)
+                    .date(LocalDate.now(KOREA_ZONE))
+                    .build();
+
 
             todoRepository.save(mission);
             log.info("사용자 {}의 미션 생성 완료: {}", user.getId(), missionResponse.getMissionTitle());

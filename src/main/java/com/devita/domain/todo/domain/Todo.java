@@ -9,9 +9,7 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
-@ToString
 public class Todo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,7 +30,7 @@ public class Todo {
     private String updatedAt;
 
     @Builder
-    public Todo(User user, Category category, String title, Boolean status, LocalDate date) {
+    private Todo(User user, Category category, String title, Boolean status, LocalDate date) {
         this.user = user;
         this.category = category;
         this.title = title;
@@ -42,5 +40,11 @@ public class Todo {
 
     public void toggleSatatus() {
         this.status = !this.status;
+    }
+
+    public void updateDetails(Category category, String title, LocalDate date) {
+        this.category = category;
+        this.title = title;
+        this.date = date;
     }
 }

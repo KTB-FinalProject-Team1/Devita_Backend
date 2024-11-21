@@ -66,9 +66,10 @@ public class TodoService {
             throw new AccessDeniedException(ErrorCode.TODO_ACCESS_DENIED);  // userId가 일치하지 않으면 AccessDeniedException 발생
         }
 
-        todo.setCategory(categoryRepository.findById(todoReqDTO.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND)));
-        todo.setTitle(todoReqDTO.getTitle());
-        todo.setDate(todoReqDTO.getDate());
+        Category category = categoryRepository.findById(todoReqDTO.getCategoryId())
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
+
+        todo.updateDetails(category, todoReqDTO.getTitle(), todoReqDTO.getDate());
 
         return todoRepository.save(todo);
     }
