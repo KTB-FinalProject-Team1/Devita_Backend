@@ -3,10 +3,7 @@ package com.devita.domain.category.domain;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.user.domain.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -36,13 +33,13 @@ public class Category {
     private String updatedAt;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Todo> todoEntities;
+    private List<Todo> todoEntities = new ArrayList<>();
 
-    public Category(User user, String name, String color){
+    @Builder
+    public Category(User user, String name, String color) {
         this.user = user;
         this.name = name;
         this.color = color;
-        todoEntities = new ArrayList<>();
     }
 
 }

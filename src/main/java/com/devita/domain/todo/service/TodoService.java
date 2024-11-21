@@ -39,12 +39,13 @@ public class TodoService {
         Category category = categoryRepository.findById(todoReqDTO.getCategoryId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        Todo todo = new Todo();
-        todo.setUser(user);
-        todo.setCategory(category);
-        todo.setTitle(todoReqDTO.getTitle());
-        todo.setStatus(false);
-        todo.setDate(todoReqDTO.getDate());
+        Todo todo = Todo.builder()
+                .user(user)
+                .category(category)
+                .title(todoReqDTO.getTitle())
+                .status(false)
+                .date(todoReqDTO.getDate())
+                .build();
 
         return todoRepository.save(todo);
     }

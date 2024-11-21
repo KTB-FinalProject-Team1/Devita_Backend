@@ -66,15 +66,24 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
-                    User newUser = new User(email, nickname, AuthProvider.KAKAO, profileImage);
+                    User newUser = User.builder()
+                            .email(email)
+                            .nickname(nickname)
+                            .provider(AuthProvider.KAKAO)
+                            .profileImage(profileImage)
+                            .build();
+
                     User savedUser = userRepository.save(newUser);
 
-                    // 새 유저의 Reward 엔티티 생성
-                    RewardEntity reward = new RewardEntity(savedUser);
+                    RewardEntity reward = RewardEntity.builder()
+                            .user(savedUser)
+                            .experience(0)
+                            .nutrition(0)
+                            .build();
                     rewardRepository.save(reward);
 
                     createDefaultCategories(savedUser.getId());
-                    createDeaultInfo(savedUser);
+                    createDefaultInfo(savedUser);
 
                     return savedUser;
                 });
@@ -102,7 +111,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         }
     }
 
-    private void createDeaultInfo(User user){
+    private void createDefaultInfo(User user){
         /*
         사용자 생성 시 일일 미션 미리 넣어놓기
         카테고리 몇개 넣어 놓기

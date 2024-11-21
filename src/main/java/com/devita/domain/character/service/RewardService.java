@@ -52,10 +52,13 @@ public class RewardService {
 
         // 보상 지급
         RewardEntity rewardEntity = rewardRepository.findByUserId(user.getId())
-                .orElseGet(() -> {
-                    RewardEntity newReward = new RewardEntity(user);
-                    return rewardRepository.save(newReward);
-                });
+                .orElseGet(() -> rewardRepository.save(
+                        RewardEntity.builder()
+                                .user(user)
+                                .experience(0)
+                                .nutrition(0)
+                                .build()
+                ));
 
         Reward rewardInfo = todoType.getReward();
         switch (rewardInfo.getType()) {

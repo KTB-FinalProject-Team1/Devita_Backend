@@ -58,11 +58,11 @@ public class CategoryService {
         List<CategoryResDTO> categoryResDTOS = new ArrayList<>();
 
         for (Category category : categories){
-            CategoryResDTO categoryResDto = new CategoryResDTO();
-
-            categoryResDto.setId(category.getId());
-            categoryResDto.setName(category.getName());
-            categoryResDto.setColor(category.getColor());
+            CategoryResDTO categoryResDto = CategoryResDTO.builder()
+                    .id(category.getId())
+                    .name(category.getName())
+                    .color(category.getColor())
+                    .build();
 
             categoryResDTOS.add(categoryResDto);
         }

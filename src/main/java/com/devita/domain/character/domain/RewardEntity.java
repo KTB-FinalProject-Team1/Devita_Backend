@@ -2,6 +2,7 @@ package com.devita.domain.character.domain;
 
 import com.devita.domain.user.domain.User;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -30,10 +31,11 @@ public class RewardEntity {
     @LastModifiedDate
     private LocalDateTime updatedAt;
 
-    public RewardEntity(User user) {
+    @Builder
+    public RewardEntity(User user, int experience, int nutrition) {
         this.user = user;
-        this.experience = 0;
-        this.nutrition = 0;
+        this.experience = experience;
+        this.nutrition = nutrition;
     }
 
     public void addExperience(int amount) {

@@ -89,7 +89,13 @@ public class MissionService {
         Category category = categoryRepository.findByUserIdAndName(userId, FREE_MISSION)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        Todo todo = new Todo(user, category, freeSaveReqDTO.getMissionTitle(), LocalDate.now(KOREA_ZONE));
+        Todo todo = Todo.builder()
+                .user(user)
+                .category(category)
+                .title(freeSaveReqDTO.getMissionTitle())
+                .status(false)
+                .date(LocalDate.now(KOREA_ZONE))
+                .build();
 
         return todoRepository.save(todo);
     }

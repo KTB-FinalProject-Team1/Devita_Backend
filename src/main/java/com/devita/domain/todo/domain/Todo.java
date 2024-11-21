@@ -31,11 +31,12 @@ public class Todo {
     private String createdAt;
     private String updatedAt;
 
-    public Todo(User user, Category category, String title, LocalDate date) {
+    @Builder
+    public Todo(User user, Category category, String title, Boolean status, LocalDate date) {
         this.user = user;
         this.category = category;
         this.title = title;
-        this.status = false;
+        this.status = status;
         this.date = date;
     }
 

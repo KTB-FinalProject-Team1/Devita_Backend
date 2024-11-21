@@ -3,6 +3,7 @@ package com.devita.domain.user.domain;
 import com.devita.domain.category.domain.Category;
 import com.devita.domain.todo.domain.Todo;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -60,6 +61,7 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Builder
     public User(String email, String nickname, AuthProvider provider, String profileImage) {
         this.email = email;
         this.nickname = nickname;
