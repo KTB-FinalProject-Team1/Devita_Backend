@@ -54,19 +54,12 @@ public class CategoryService {
     }
 
     public List<CategoryResDTO> findUserCategories(Long userId) {
-        List<Category> categories = categoryRepository.findByUserId(userId);
-        List<CategoryResDTO> categoryResDTOS = new ArrayList<>();
-
-        for (Category category : categories){
-            CategoryResDTO categoryResDto = CategoryResDTO.builder()
-                    .id(category.getId())
-                    .name(category.getName())
-                    .color(category.getColor())
-                    .build();
-
-            categoryResDTOS.add(categoryResDto);
-        }
-
-        return categoryResDTOS;
+        return categoryRepository.findByUserId(userId).stream()
+                .map(category -> CategoryResDTO.builder()
+                        .id(category.getId())
+                        .name(category.getName())
+                        .color(category.getColor())
+                        .build())
+                .toList();
     }
 }
