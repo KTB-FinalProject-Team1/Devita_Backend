@@ -1,11 +1,10 @@
 package com.devita.domain.character.service;
 
-import com.devita.common.constant.MissionRewardConstants;
 import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
 import com.devita.domain.character.domain.Reward;
-import com.devita.domain.character.enums.TodoType;
+import com.devita.domain.character.enums.MissionEnum;
 import com.devita.domain.character.domain.RewardType;
 import com.devita.domain.character.repository.RewardRepository;
 import com.devita.domain.todo.domain.Todo;
@@ -27,26 +26,23 @@ public class RewardService {
     private final RedisTemplate<String, Integer> redisTemplate;
     private final RewardRepository rewardRepository;
 
-    private static final int USER_TODO_LIMIT = 300000;
-    private static final int DAILY_MISSION_LIMIT = 300000;
-    private static final int FREE_MISSION_LIMIT = 300000;
     private static final int NUTRITION_THRESHOLD = 0;
 
     @Transactional
     public void processReward(User user, Todo todo) {
-        TodoType todoType;
+        MissionEnum missionEnum;
 
         try {
-            todoType = TodoType.fromCategory(todo.getCategory().getName());
+            missionEnum = MissionEnum.fromCategory(todo.getCategory().getName());
         } catch (IllegalArgumentException e) {
-            log.error("잘못된 TodoType: {}", todo.getCategory().getName());
+            log.error("잘못된 TodoEnum: {}", todo.getCategory().getName());
             throw new IllegalArgumentException(ErrorCode.INVALID_TODO_TYPE.getMessage());
         }
 
-        String key = generateKey(user.getId(), todoType);
+        String key = generateKey(user.getId(), missionEnum);
 
-        if (!canReceiveReward(user.getId(), todoType)) {
-            log.warn("{} 해당 유저의 {} 미션 완료 보상 지급 최대 한도 초과", user.getId(), todoType);
+        if (!canReceiveReward(user.getId(), missionEnum)) {
+            log.warn("{} 해당 유저의 {} 미션 완료 보상 지급 최대 한도 초과", user.getId(), missionEnum);
             throw new AccessDeniedException(ErrorCode.DAILY_REWARD_LIMIT_EXCEEDED);
         }
 
@@ -73,7 +69,7 @@ public class RewardService {
                                 .build()
                 ));
 
-        RewardType rewardTypeInfo = todoType.getRewardType();
+        RewardType rewardTypeInfo = missionEnum.getRewardType();
         switch (rewardTypeInfo.getType()) {
             case EXPERIENCE -> reward.addExperience(rewardTypeInfo.getAmount());
             case NUTRITION -> reward.addNutrition(rewardTypeInfo.getAmount());
@@ -86,24 +82,21 @@ public class RewardService {
 
 
     // 일일 보상 제한 확인
-    private boolean canReceiveReward(Long userId, TodoType todoType) {
-        String key = generateKey(userId, todoType);
+    private boolean canReceiveReward(Long userId, MissionEnum missionEnum) {
+        String key = generateKey(userId, missionEnum);
         Integer count = redisTemplate.opsForValue().get(key);
 
         if (count == null) {
             return true;
         }
 
-        return count < switch (todoType) {
-            case USER_TODO -> USER_TODO_LIMIT;
-            case DAILY_MISSION -> DAILY_MISSION_LIMIT;
-            case FREE_MISSION -> FREE_MISSION_LIMIT;
-        };
+        return count < missionEnum.getDailyLimit(); // MissionType에서 일일 제한을 가져옴
+
     }
 
     //레디스 키 생성
-    private String generateKey(Long userId, TodoType todoType) {
-        return userId + ":" + todoType.name();
+    private String generateKey(Long userId, MissionEnum todoEnum) {
+        return userId + ":" + todoEnum.name();
     }
 
     // 레디스 TTL 설정
