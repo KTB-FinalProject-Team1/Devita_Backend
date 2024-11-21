@@ -47,8 +47,7 @@ public class CategoryService {
             throw new AccessDeniedException(ErrorCode.CATEGORY_ACCESS_DENIED);  // userId가 일치하지 않으면 AccessDeniedException 발생
         }
 
-        category.setName(categoryReqDto.getName());
-        category.setColor(categoryReqDto.getColor());
+        category.setNameAndColor(categoryReqDto.getName(), categoryReqDto.getColor());
 
         return categoryRepository.save(category);
     }

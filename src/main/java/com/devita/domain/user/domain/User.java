@@ -1,5 +1,6 @@
 package com.devita.domain.user.domain;
 
+import com.devita.common.entity.BaseEntity;
 import com.devita.domain.category.domain.Category;
 import com.devita.domain.todo.domain.Todo;
 import jakarta.persistence.*;
@@ -19,7 +20,7 @@ import java.util.List;
 @EntityListeners(AuditingEntityListener.class)
 @Getter
 @NoArgsConstructor
-public class User {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
@@ -52,14 +53,6 @@ public class User {
     private List<PreferredCategory> preferredCategories = new ArrayList<>();
 
     private String profileImage;
-
-    @CreatedDate
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
 
     @Builder
     public User(String email, String nickname, AuthProvider provider, String profileImage) {

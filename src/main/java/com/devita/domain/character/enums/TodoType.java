@@ -1,19 +1,19 @@
 package com.devita.domain.character.enums;
 
 import com.devita.common.constant.CategoryConstants;
-import com.devita.domain.character.domain.Reward;
+import com.devita.domain.character.domain.RewardType;
 import lombok.Getter;
 
 @Getter
 public enum TodoType {
-    USER_TODO(new Reward(RewardType.EXPERIENCE, 10)),
-    DAILY_MISSION(new Reward(RewardType.NUTRITION, 3)),
-    FREE_MISSION(new Reward(RewardType.NUTRITION, 1));
+    USER_TODO(new RewardType(com.devita.domain.character.enums.RewardType.EXPERIENCE, 10)),
+    DAILY_MISSION(new RewardType(com.devita.domain.character.enums.RewardType.NUTRITION, 3)),
+    FREE_MISSION(new RewardType(com.devita.domain.character.enums.RewardType.NUTRITION, 1));
 
-    private final Reward reward;
+    private final RewardType rewardType;
 
-    TodoType(Reward reward) {
-        this.reward = reward;
+    TodoType(RewardType rewardType) {
+        this.rewardType = rewardType;
     }
 
     public static TodoType fromCategory(String categoryName) {

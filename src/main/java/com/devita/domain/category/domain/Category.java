@@ -1,5 +1,6 @@
 package com.devita.domain.category.domain;
 
+import com.devita.common.entity.BaseEntity;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.user.domain.User;
 import jakarta.persistence.*;
@@ -12,10 +13,9 @@ import java.util.List;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @ToString
-public class Category {
+public class Category extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,10 +27,6 @@ public class Category {
     private String name;
 
     private String color;
-    @CreatedDate
-    private String createdAt;
-    @LastModifiedDate
-    private String updatedAt;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Todo> todoEntities = new ArrayList<>();
@@ -38,6 +34,11 @@ public class Category {
     @Builder
     public Category(User user, String name, String color) {
         this.user = user;
+        this.name = name;
+        this.color = color;
+    }
+
+    public void setNameAndColor(String name, String color){
         this.name = name;
         this.color = color;
     }

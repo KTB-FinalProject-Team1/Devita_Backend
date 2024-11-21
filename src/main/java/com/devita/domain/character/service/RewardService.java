@@ -3,9 +3,9 @@ package com.devita.domain.character.service;
 import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
-import com.devita.domain.character.domain.RewardEntity;
-import com.devita.domain.character.enums.TodoType;
 import com.devita.domain.character.domain.Reward;
+import com.devita.domain.character.enums.TodoType;
+import com.devita.domain.character.domain.RewardType;
 import com.devita.domain.character.repository.RewardRepository;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.user.domain.User;
@@ -51,24 +51,24 @@ public class RewardService {
         }
 
         // 보상 지급
-        RewardEntity rewardEntity = rewardRepository.findByUserId(user.getId())
+        Reward reward = rewardRepository.findByUserId(user.getId())
                 .orElseGet(() -> rewardRepository.save(
-                        RewardEntity.builder()
+                        Reward.builder()
                                 .user(user)
                                 .experience(0)
                                 .nutrition(0)
                                 .build()
                 ));
 
-        Reward rewardInfo = todoType.getReward();
-        switch (rewardInfo.getType()) {
-            case EXPERIENCE -> rewardEntity.addExperience(rewardInfo.getAmount());
-            case NUTRITION -> rewardEntity.addNutrition(rewardInfo.getAmount());
+        RewardType rewardTypeInfo = todoType.getRewardType();
+        switch (rewardTypeInfo.getType()) {
+            case EXPERIENCE -> reward.addExperience(rewardTypeInfo.getAmount());
+            case NUTRITION -> reward.addNutrition(rewardTypeInfo.getAmount());
         }
 
-        rewardRepository.save(rewardEntity);
+        rewardRepository.save(reward);
         log.info("유저 아이디 {}: 보상 타입={}, 수량={}",
-                user.getId(), rewardInfo.getType(), rewardInfo.getAmount());
+                user.getId(), rewardTypeInfo.getType(), rewardTypeInfo.getAmount());
     }
 
 
@@ -102,15 +102,15 @@ public class RewardService {
 
     @Transactional
     public Long useNutrition(Long userId){
-        RewardEntity rewardEntity = rewardRepository.findByUserId(userId)
+        Reward reward = rewardRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
-        if (rewardEntity.getNutrition() <= NUTRITION_THRESHOLD){
+        if (reward.getNutrition() <= NUTRITION_THRESHOLD){
             throw new AccessDeniedException(ErrorCode.INSUFFICIENT_SUPPLEMENTS);
         }
 
-        rewardEntity.useNutrition();
+        reward.useNutrition();
 
-        return rewardEntity.getId();
+        return reward.getId();
     }
 }

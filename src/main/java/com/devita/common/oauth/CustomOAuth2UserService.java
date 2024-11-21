@@ -6,7 +6,7 @@ import com.devita.domain.category.domain.Category;
 import com.devita.domain.category.dto.CategoryReqDTO;
 import com.devita.domain.category.repository.CategoryRepository;
 import com.devita.domain.category.service.CategoryService;
-import com.devita.domain.character.domain.RewardEntity;
+import com.devita.domain.character.domain.Reward;
 import com.devita.domain.character.repository.RewardRepository;
 import com.devita.domain.mission.dto.ai.DailyMissionAiResDTO;
 import com.devita.domain.todo.domain.Todo;
@@ -78,7 +78,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
                     User savedUser = userRepository.save(newUser);
 
-                    RewardEntity reward = RewardEntity.builder()
+                    Reward reward = Reward.builder()
                             .user(savedUser)
                             .experience(0)
                             .nutrition(0)
