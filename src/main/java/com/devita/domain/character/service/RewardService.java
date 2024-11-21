@@ -1,5 +1,6 @@
 package com.devita.domain.character.service;
 
+import com.devita.common.constant.MissionRewardConstants;
 import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
@@ -31,23 +32,35 @@ public class RewardService {
     private static final int FREE_MISSION_LIMIT = 300000;
     private static final int NUTRITION_THRESHOLD = 0;
 
-    // 보상 지급 프로세스
     @Transactional
     public void processReward(User user, Todo todo) {
-        TodoType todoType = TodoType.fromCategory(todo.getCategory().getName());
+        TodoType todoType;
+
+        try {
+            todoType = TodoType.fromCategory(todo.getCategory().getName());
+        } catch (IllegalArgumentException e) {
+            log.error("잘못된 TodoType: {}", todo.getCategory().getName());
+            throw new IllegalArgumentException(ErrorCode.INVALID_TODO_TYPE.getMessage());
+        }
+
         String key = generateKey(user.getId(), todoType);
 
         if (!canReceiveReward(user.getId(), todoType)) {
             log.warn("{} 해당 유저의 {} 미션 완료 보상 지급 최대 한도 초과", user.getId(), todoType);
-            throw new IllegalStateException("일일 보상 한도를 초과했습니다.");
+            throw new AccessDeniedException(ErrorCode.DAILY_REWARD_LIMIT_EXCEEDED);
         }
 
         // Redis 카운트 증가 또는 초기화
-        Boolean keyExists = redisTemplate.hasKey(key);
-        if (Boolean.FALSE.equals(keyExists)) {
-            redisTemplate.opsForValue().set(key, 1, getTimeUntilMidnight(), TimeUnit.SECONDS);
-        } else {
-            redisTemplate.opsForValue().increment(key);
+        try {
+            Boolean keyExists = redisTemplate.hasKey(key);
+            if (Boolean.FALSE.equals(keyExists)) {
+                redisTemplate.opsForValue().set(key, 1, getTimeUntilMidnight(), TimeUnit.SECONDS);
+            } else {
+                redisTemplate.opsForValue().increment(key);
+            }
+        } catch (Exception e) {
+            log.error("Redis 서버와의 통신 중 오류 발생: {}", e.getMessage());
+            throw new IllegalStateException(ErrorCode.REDIS_SERVER_ERROR.getMessage(), e);
         }
 
         // 보상 지급

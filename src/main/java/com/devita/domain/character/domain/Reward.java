@@ -1,6 +1,7 @@
 package com.devita.domain.character.domain;
 
 import com.devita.common.entity.BaseEntity;
+import com.devita.common.exception.ErrorCode;
 import com.devita.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -30,10 +31,16 @@ public class Reward extends BaseEntity {
     }
 
     public void addExperience(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException(ErrorCode.INVALID_REWARD_VALUE.getMessage());
+        }
         this.experience += amount;
     }
 
     public void addNutrition(int amount) {
+        if (amount < 0) {
+            throw new IllegalArgumentException(ErrorCode.INVALID_REWARD_VALUE.getMessage());
+        }
         this.nutrition += amount;
     }
 
