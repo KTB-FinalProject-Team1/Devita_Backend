@@ -1,5 +1,6 @@
 package com.devita.domain.todo.domain;
 
+import com.devita.common.entity.BaseEntity;
 import com.devita.domain.category.domain.Category;
 import com.devita.domain.user.domain.User;
 import jakarta.persistence.*;
@@ -9,10 +10,8 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
-@ToString
-public class Todo {
+public class Todo extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,18 +27,23 @@ public class Todo {
     private String title;
     private Boolean status;
     private LocalDate date;
-    private String createdAt;
-    private String updatedAt;
 
-    public Todo(User user, Category category, String title, LocalDate date) {
+    @Builder
+    private Todo(User user, Category category, String title, Boolean status, LocalDate date) {
         this.user = user;
         this.category = category;
         this.title = title;
-        this.status = false;
+        this.status = status;
         this.date = date;
     }
 
     public void toggleSatatus() {
         this.status = !this.status;
+    }
+
+    public void updateDetails(Category category, String title, LocalDate date) {
+        this.category = category;
+        this.title = title;
+        this.date = date;
     }
 }

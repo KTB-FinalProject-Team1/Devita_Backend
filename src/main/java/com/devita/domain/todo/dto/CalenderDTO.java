@@ -7,12 +7,12 @@ import java.time.LocalDate;
 
 @Data
 public class CalenderDTO {
+
     private Long todoId;
     private Long categoryId;
     private String title;
     private Boolean status;
     private LocalDate date;
-
 
     public static CalenderDTO fromEntity(Todo todo) {
         CalenderDTO dto = new CalenderDTO();

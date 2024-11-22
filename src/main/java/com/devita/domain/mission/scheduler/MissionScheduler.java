@@ -35,7 +35,7 @@ public class MissionScheduler {
     private static final ZoneId KOREA_ZONE = ZoneId.of("Asia/Seoul");
 
     @Scheduled(cron = "0 5 21 * * *", zone = "Asia/Seoul")
-    public void createDailyMissions() {
+    private void createDailyMissions() {
         log.info("미션 생성 시작 시간: {}", LocalDateTime.now());
 
         List<User> userEntities = userRepository.findAll();
@@ -49,13 +49,13 @@ public class MissionScheduler {
                 // AI 서버에 Daily Mission 요청
                 DailyMissionAiResDTO missionResponse = missionService.requestDailyMission(user.getId(), List.of("Java"));
 
-                // 미션 생성
-                Todo mission = new Todo();
-                mission.setUser(user);
-                mission.setCategory(dailyMissionCategory);
-                mission.setTitle(missionResponse.getMissionTitle());
-                mission.setStatus(false);
-                mission.setDate(LocalDate.now(KOREA_ZONE));
+                Todo mission = Todo.builder()
+                        .user(user)
+                        .category(dailyMissionCategory)
+                        .title(missionResponse.getMissionTitle())
+                        .status(false)
+                        .date(LocalDate.now(KOREA_ZONE))
+                        .build();
 
                 todoRepository.save(mission);
                 log.info("사용자 {}의 미션 생성 완료: {}", user.getId(), missionResponse.getMissionTitle());

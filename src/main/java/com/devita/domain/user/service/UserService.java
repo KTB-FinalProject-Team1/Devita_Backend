@@ -2,7 +2,7 @@ package com.devita.domain.user.service;
 
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
-import com.devita.domain.character.domain.RewardEntity;
+import com.devita.domain.character.domain.Reward;
 import com.devita.domain.character.repository.RewardRepository;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.dto.PreferredCategoryRequest;
@@ -39,7 +39,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserInfoResponse getUserInfo(Long userId) {
         User user = getUserById(userId);
-        RewardEntity reward = rewardRepository.findById(userId)
+        Reward reward = rewardRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.REWARD_NOT_FOUND));
 
         return new UserInfoResponse(user, reward);

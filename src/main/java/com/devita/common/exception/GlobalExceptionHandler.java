@@ -13,8 +13,8 @@ public class GlobalExceptionHandler {
     // 400 Bad Request
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ApiResponse<?>> handleBadRequestException(IllegalArgumentException ex, HttpServletRequest request) {
-        ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.INVALID_INPUT_VALUE, request.getRequestURI());
-        return new ResponseEntity<>(ApiResponse.error(errorResponse), ErrorCode.INVALID_INPUT_VALUE.getStatus());
+        ErrorResponse errorResponse = ErrorResponse.of(ex.getErrorCode(), request.getRequestURI());
+        return new ResponseEntity<>(ApiResponse.error(errorResponse), ex.getErrorCode().getStatus());
     }
 
     // 403 Forbidden

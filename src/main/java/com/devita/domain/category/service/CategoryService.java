@@ -3,6 +3,7 @@ package com.devita.domain.category.service;
 import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
+import com.devita.common.exception.IllegalArgumentException;
 import com.devita.domain.category.domain.Category;
 import com.devita.domain.category.dto.CategoryReqDTO;
 import com.devita.domain.category.dto.CategoryResDTO;
@@ -12,7 +13,6 @@ import com.devita.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,6 +26,11 @@ public class CategoryService {
     public Category createCategory(Long userId, CategoryReqDTO categoryReqDto) {
         User user = userRepository.findById(userId).orElseThrow();
 
+        boolean exists = categoryRepository.existsByUserIdAndName(userId, categoryReqDto.getName());
+        if (exists) {
+            throw new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND);
+        }
+
         Category category = new Category(user, categoryReqDto.getName(), categoryReqDto.getColor());
 
         return categoryRepository.save(category);
@@ -36,7 +41,15 @@ public class CategoryService {
                 .filter(t -> t.getUser().getId().equals(userId))  // userId가 일치하는지 확인
                 .orElseThrow(() -> new AccessDeniedException(ErrorCode.CATEGORY_ACCESS_DENIED));
 
+        if (isMissionCategory(category.getName())) {
+            throw new AccessDeniedException(ErrorCode.MISSION_CATEGORY_ACCESS_DENIED);
+        }
+
         categoryRepository.delete(category);
+    }
+
+    private boolean isMissionCategory(String categoryName) {
+        return List.of("일일 미션", "자율 미션").contains(categoryName);
     }
 
     public Category updateCategory(Long userId, Long categoryId, CategoryReqDTO categoryReqDto) {
@@ -47,26 +60,29 @@ public class CategoryService {
             throw new AccessDeniedException(ErrorCode.CATEGORY_ACCESS_DENIED);  // userId가 일치하지 않으면 AccessDeniedException 발생
         }
 
-        category.setName(categoryReqDto.getName());
-        category.setColor(categoryReqDto.getColor());
+        validateCategoryRequest(categoryReqDto);
+
+        category.setNameAndColor(categoryReqDto.getName(), categoryReqDto.getColor());
 
         return categoryRepository.save(category);
     }
 
-    public List<CategoryResDTO> findUserCategories(Long userId) {
-        List<Category> categories = categoryRepository.findByUserId(userId);
-        List<CategoryResDTO> categoryResDTOS = new ArrayList<>();
-
-        for (Category category : categories){
-            CategoryResDTO categoryResDto = new CategoryResDTO();
-
-            categoryResDto.setId(category.getId());
-            categoryResDto.setName(category.getName());
-            categoryResDto.setColor(category.getColor());
-
-            categoryResDTOS.add(categoryResDto);
+    private void validateCategoryRequest(CategoryReqDTO categoryReqDto) {
+        if (categoryReqDto.getName() == null || categoryReqDto.getName().isBlank()) {
+            throw new IllegalArgumentException(ErrorCode.INVALID_CATEGORY_NAME);
         }
+        if (categoryReqDto.getColor() == null || categoryReqDto.getColor().isBlank()) {
+            throw new IllegalArgumentException(ErrorCode.INVALID_CATEGORY_COLOR);
+        }
+    }
 
-        return categoryResDTOS;
+    public List<CategoryResDTO> findUserCategories(Long userId) {
+        return categoryRepository.findByUserId(userId).stream()
+                .map(category -> CategoryResDTO.builder()
+                        .id(category.getId())
+                        .name(category.getName())
+                        .color(category.getColor())
+                        .build())
+                .toList();
     }
 }

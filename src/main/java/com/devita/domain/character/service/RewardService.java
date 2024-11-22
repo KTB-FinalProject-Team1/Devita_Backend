@@ -3,9 +3,9 @@ package com.devita.domain.character.service;
 import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
-import com.devita.domain.character.domain.RewardEntity;
-import com.devita.domain.character.enums.TodoType;
 import com.devita.domain.character.domain.Reward;
+import com.devita.domain.character.enums.MissionEnum;
+import com.devita.domain.character.domain.RewardType;
 import com.devita.domain.character.repository.RewardRepository;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.user.domain.User;
@@ -26,68 +26,77 @@ public class RewardService {
     private final RedisTemplate<String, Integer> redisTemplate;
     private final RewardRepository rewardRepository;
 
-    private static final int USER_TODO_LIMIT = 300000;
-    private static final int DAILY_MISSION_LIMIT = 300000;
-    private static final int FREE_MISSION_LIMIT = 300000;
     private static final int NUTRITION_THRESHOLD = 0;
 
-    // 보상 지급 프로세스
     @Transactional
     public void processReward(User user, Todo todo) {
-        TodoType todoType = TodoType.fromCategory(todo.getCategory().getName());
-        String key = generateKey(user.getId(), todoType);
+        MissionEnum missionEnum;
 
-        if (!canReceiveReward(user.getId(), todoType)) {
-            log.warn("{} 해당 유저의 {} 미션 완료 보상 지급 최대 한도 초과", user.getId(), todoType);
-            throw new IllegalStateException("일일 보상 한도를 초과했습니다.");
+        try {
+            missionEnum = MissionEnum.fromCategory(todo.getCategory().getName());
+        } catch (IllegalArgumentException e) {
+            log.error("잘못된 TodoEnum: {}", todo.getCategory().getName());
+            throw new IllegalArgumentException(ErrorCode.INVALID_TODO_TYPE.getMessage());
+        }
+
+        String key = generateKey(user.getId(), missionEnum);
+
+        if (!canReceiveReward(user.getId(), missionEnum)) {
+            log.warn("{} 해당 유저의 {} 미션 완료 보상 지급 최대 한도 초과", user.getId(), missionEnum);
+            throw new AccessDeniedException(ErrorCode.DAILY_REWARD_LIMIT_EXCEEDED);
         }
 
         // Redis 카운트 증가 또는 초기화
-        Boolean keyExists = redisTemplate.hasKey(key);
-        if (Boolean.FALSE.equals(keyExists)) {
-            redisTemplate.opsForValue().set(key, 1, getTimeUntilMidnight(), TimeUnit.SECONDS);
-        } else {
-            redisTemplate.opsForValue().increment(key);
+        try {
+            Boolean keyExists = redisTemplate.hasKey(key);
+            if (Boolean.FALSE.equals(keyExists)) {
+                redisTemplate.opsForValue().set(key, 1, getTimeUntilMidnight(), TimeUnit.SECONDS);
+            } else {
+                redisTemplate.opsForValue().increment(key);
+            }
+        } catch (Exception e) {
+            log.error("Redis 서버와의 통신 중 오류 발생: {}", e.getMessage());
+            throw new IllegalStateException(ErrorCode.REDIS_SERVER_ERROR.getMessage(), e);
         }
 
         // 보상 지급
-        RewardEntity rewardEntity = rewardRepository.findByUserId(user.getId())
-                .orElseGet(() -> {
-                    RewardEntity newReward = new RewardEntity(user);
-                    return rewardRepository.save(newReward);
-                });
+        Reward reward = rewardRepository.findByUserId(user.getId())
+                .orElseGet(() -> rewardRepository.save(
+                        Reward.builder()
+                                .user(user)
+                                .experience(0)
+                                .nutrition(0)
+                                .build()
+                ));
 
-        Reward rewardInfo = todoType.getReward();
-        switch (rewardInfo.getType()) {
-            case EXPERIENCE -> rewardEntity.addExperience(rewardInfo.getAmount());
-            case NUTRITION -> rewardEntity.addNutrition(rewardInfo.getAmount());
+        RewardType rewardTypeInfo = missionEnum.getRewardType();
+        switch (rewardTypeInfo.getType()) {
+            case EXPERIENCE -> reward.addExperience(rewardTypeInfo.getAmount());
+            case NUTRITION -> reward.addNutrition(rewardTypeInfo.getAmount());
         }
 
-        rewardRepository.save(rewardEntity);
+        rewardRepository.save(reward);
         log.info("유저 아이디 {}: 보상 타입={}, 수량={}",
-                user.getId(), rewardInfo.getType(), rewardInfo.getAmount());
+                user.getId(), rewardTypeInfo.getType(), rewardTypeInfo.getAmount());
     }
 
 
     // 일일 보상 제한 확인
-    private boolean canReceiveReward(Long userId, TodoType todoType) {
-        String key = generateKey(userId, todoType);
+    private boolean canReceiveReward(Long userId, MissionEnum missionEnum) {
+        String key = generateKey(userId, missionEnum);
         Integer count = redisTemplate.opsForValue().get(key);
 
         if (count == null) {
             return true;
         }
 
-        return count < switch (todoType) {
-            case USER_TODO -> USER_TODO_LIMIT;
-            case DAILY_MISSION -> DAILY_MISSION_LIMIT;
-            case FREE_MISSION -> FREE_MISSION_LIMIT;
-        };
+        return count < missionEnum.getDailyLimit(); // MissionType에서 일일 제한을 가져옴
+
     }
 
     //레디스 키 생성
-    private String generateKey(Long userId, TodoType todoType) {
-        return userId + ":" + todoType.name();
+    private String generateKey(Long userId, MissionEnum todoEnum) {
+        return userId + ":" + todoEnum.name();
     }
 
     // 레디스 TTL 설정
@@ -99,15 +108,15 @@ public class RewardService {
 
     @Transactional
     public Long useNutrition(Long userId){
-        RewardEntity rewardEntity = rewardRepository.findByUserId(userId)
+        Reward reward = rewardRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.RESOURCE_NOT_FOUND));
 
-        if (rewardEntity.getNutrition() <= NUTRITION_THRESHOLD){
+        if (reward.getNutrition() <= NUTRITION_THRESHOLD){
             throw new AccessDeniedException(ErrorCode.INSUFFICIENT_SUPPLEMENTS);
         }
 
-        rewardEntity.useNutrition();
+        reward.useNutrition();
 
-        return rewardEntity.getId();
+        return reward.getId();
     }
 }
