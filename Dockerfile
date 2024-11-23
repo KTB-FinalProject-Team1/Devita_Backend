@@ -42,7 +42,7 @@ RUN cp build/libs/devita-0.0.1-SNAPSHOT.jar /app/app.jar
 RUN service redis-server start
 
 # Step 13: 애플리케이션 포트 설정
-EXPOSE 8080 3306 6379
+EXPOSE 8080 6379
 
 # Step 14: 컨테이너 시작 시 MariaDB와 Redis 자동 시작 및 애플리케이션 실행
 CMD service redis-server start && java -jar /app/app.jar
