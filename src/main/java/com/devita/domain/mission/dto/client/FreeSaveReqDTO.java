@@ -1,9 +1,5 @@
 package com.devita.domain.mission.dto.client;
 
-
-import lombok.Data;
-
-@Data
-public class FreeSaveReqDTO {
-    private String missionTitle;
-}
+public record FreeSaveReqDTO(
+        String missionTitle
+) {}

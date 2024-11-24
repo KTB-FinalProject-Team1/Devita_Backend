@@ -36,15 +36,15 @@ public class TodoService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
 
-        Category category = categoryRepository.findById(todoReqDTO.getCategoryId())
+        Category category = categoryRepository.findById(todoReqDTO.categoryId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
         Todo todo = Todo.builder()
                 .user(user)
                 .category(category)
-                .title(todoReqDTO.getTitle())
+                .title(todoReqDTO.title())
                 .status(false)
-                .date(todoReqDTO.getDate())
+                .date(todoReqDTO.date())
                 .build();
 
         return todoRepository.save(todo);
@@ -66,10 +66,10 @@ public class TodoService {
             throw new AccessDeniedException(ErrorCode.TODO_ACCESS_DENIED);  // userId가 일치하지 않으면 AccessDeniedException 발생
         }
 
-        Category category = categoryRepository.findById(todoReqDTO.getCategoryId())
+        Category category = categoryRepository.findById(todoReqDTO.categoryId())
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        todo.updateDetails(category, todoReqDTO.getTitle(), todoReqDTO.getDate());
+        todo.updateDetails(category, todoReqDTO.title(), todoReqDTO.date());
 
         return todoRepository.save(todo);
     }

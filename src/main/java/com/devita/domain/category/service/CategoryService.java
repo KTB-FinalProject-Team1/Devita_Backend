@@ -26,12 +26,12 @@ public class CategoryService {
     public Category createCategory(Long userId, CategoryReqDTO categoryReqDto) {
         User user = userRepository.findById(userId).orElseThrow();
 
-        boolean exists = categoryRepository.existsByUserIdAndName(userId, categoryReqDto.getName());
+        boolean exists = categoryRepository.existsByUserIdAndName(userId, categoryReqDto.name());
         if (exists) {
             throw new ResourceNotFoundException(ErrorCode.CATEGORY_NOT_FOUND);
         }
 
-        Category category = new Category(user, categoryReqDto.getName(), categoryReqDto.getColor());
+        Category category = new Category(user, categoryReqDto.name(), categoryReqDto.color());
 
         return categoryRepository.save(category);
     }
@@ -62,16 +62,16 @@ public class CategoryService {
 
         validateCategoryRequest(categoryReqDto);
 
-        category.setNameAndColor(categoryReqDto.getName(), categoryReqDto.getColor());
+        category.setNameAndColor(categoryReqDto.name(), categoryReqDto.color());
 
         return categoryRepository.save(category);
     }
 
     private void validateCategoryRequest(CategoryReqDTO categoryReqDto) {
-        if (categoryReqDto.getName() == null || categoryReqDto.getName().isBlank()) {
+        if (categoryReqDto.name() == null || categoryReqDto.name().isBlank()) {
             throw new IllegalArgumentException(ErrorCode.INVALID_CATEGORY_NAME);
         }
-        if (categoryReqDto.getColor() == null || categoryReqDto.getColor().isBlank()) {
+        if (categoryReqDto.color() == null || categoryReqDto.color().isBlank()) {
             throw new IllegalArgumentException(ErrorCode.INVALID_CATEGORY_COLOR);
         }
     }

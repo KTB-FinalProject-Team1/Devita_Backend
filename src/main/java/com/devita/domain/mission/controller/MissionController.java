@@ -38,7 +38,7 @@ public class MissionController {
 
     @PostMapping("/free")
     public ApiResponse<List<MissionAiResDTO>> getFreeMission(@AuthenticationPrincipal Long userId, @RequestBody FreeMissionReqDTO freeMissionReqDTO){
-        List<MissionAiResDTO> freeMissions = missionService.requestFreeMission(userId, freeMissionReqDTO.getSubCategory());
+        List<MissionAiResDTO> freeMissions = missionService.requestFreeMission(userId, freeMissionReqDTO.subCategory());
 
         return ApiResponse.success(freeMissions);
     }
