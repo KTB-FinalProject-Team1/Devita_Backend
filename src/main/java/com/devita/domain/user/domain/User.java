@@ -2,6 +2,7 @@ package com.devita.domain.user.domain;
 
 import com.devita.common.entity.BaseEntity;
 import com.devita.domain.category.domain.Category;
+import com.devita.domain.post.domain.Post;
 import com.devita.domain.todo.domain.Todo;
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -42,6 +43,10 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Category> categories;
+
+    // 내가 작성한 게시물 목록을 확인하기 위해 작성
+    @OneToMany(mappedBy = "writer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
 
     @ElementCollection
     @CollectionTable(
