@@ -8,7 +8,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class PostResDTO {
     private Long id;
-    private User writer;
+    private String writer;
     private String title;
     private String description;
     private Long likes;

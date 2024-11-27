@@ -3,6 +3,7 @@ package com.devita.domain.post.domain;
 import com.devita.common.entity.BaseEntity;
 import com.devita.domain.user.domain.User;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,16 +26,17 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "TEXT")
     private String description;
 
-    private Long likes;
-    private Long views;
+    @Column(columnDefinition = "bigint default 0")
+    private Long likes = 0L;
+
+    @Column(columnDefinition = "bigint default 0")
+    private Long views = 0L;
 
     @Builder
-    private Post(User writer, String title, String description, Long likes, Long views) {
+    private Post(User writer, String title, String description) {
         this.writer = writer;
         this.title = title;
         this.description = description;
-        this.likes = likes;
-        this.views = views;
     }
 
     public void updatePost(String title, String description) {

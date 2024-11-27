@@ -35,11 +35,11 @@ public class PostController {
     }
 
     // 게시물 수정
-    @PostMapping("/post/{postId}")
-    public ApiResponse<Long> updatePost(@AuthenticationPrincipal Long userId, @PathVariable Long postId, @RequestBody PostReqDTO postReqDTO) {
-        postService.updatePost(userId, postId, postReqDTO);
+    @PutMapping("/post/{postId}")
+    public ApiResponse<PostResDTO> updatePost(@AuthenticationPrincipal Long userId, @PathVariable Long postId, @RequestBody PostReqDTO postReqDTO) {
+        PostResDTO postResDTO = postService.updatePost(userId, postId, postReqDTO);
 
-        return ApiResponse.success(postId);
+        return ApiResponse.success(postResDTO);
     }
 
     // 게시물 페이징 조회
@@ -58,11 +58,11 @@ public class PostController {
         return ApiResponse.success(postResDTO);
     }
 
-    // 사용자가 작성한 게시물 조회
+    // 작성한 게시물 조회
     @GetMapping("/posts/my")
     public ApiResponse<List<PostsResDTO>> getMyPosts(@AuthenticationPrincipal Long userId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
-        List<PostsResDTO> Posts = postService.getMyPosts(userId, page, size);
+        List<PostsResDTO> posts = postService.getMyPosts(userId, page, size);
 
-        return ApiResponse.success(Posts);
+        return ApiResponse.success(posts);
     }
 }

@@ -36,8 +36,6 @@ public class PostService {
                 .writer(writer)
                 .title(postReqDTO.getTitle())
                 .description(postReqDTO.getDescription())
-                .likes(0L)
-                .views(0L)
                 .build();
 
         return postRepository.save(post);
@@ -51,12 +49,13 @@ public class PostService {
     }
 
     // 게시물 수정
-    public Long updatePost(Long userId, Long postId, PostReqDTO postReqDTO) {
+    public PostResDTO updatePost(Long userId, Long postId, PostReqDTO postReqDTO) {
         Post post = validateWriter(userId, postId);
 
         post.updatePost(postReqDTO.getTitle(), postReqDTO.getDescription());
+        postRepository.save(post);
 
-        return postRepository.save(post).getId();
+        return new PostResDTO(postId, post.getWriter().getNickname(), post.getTitle(), post.getDescription(), post.getLikes(), post.getViews());
     }
 
     // 게시물 페이징 조회
@@ -79,10 +78,10 @@ public class PostService {
             postRepository.save(post);
         }
 
-        return new PostResDTO(postId, post.getWriter(), post.getTitle(), post.getDescription(), post.getLikes(), post.getViews());
+        return new PostResDTO(postId, post.getWriter().getNickname(), post.getTitle(), post.getDescription(), post.getLikes(), post.getViews());
     }
 
-    // 사용자가 작성한 게시물 조회
+    // 작성한 게시물 조회
     public List<PostsResDTO> getMyPosts(Long userId, int page, int size) {
         getWriter(userId);
 
