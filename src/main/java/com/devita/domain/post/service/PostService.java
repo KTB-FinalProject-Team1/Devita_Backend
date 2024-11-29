@@ -12,11 +12,15 @@ import com.devita.domain.user.domain.User;
 import com.devita.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +31,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final StringRedisTemplate redisTemplate;
 
     // 게시물 생성
     public Post addPost(Long userId, PostReqDTO postReqDTO) {
@@ -106,9 +111,47 @@ public class PostService {
 
     // 작성자 유무 확인
     private Post validateWriter(Long userId, Long postId) {
-        Post post = postRepository.findById(postId)
+        return postRepository.findById(postId)
                 .filter(p -> p.getWriter().getId().equals(userId))
                 .orElseThrow(() -> new AccessDeniedException(ErrorCode.ACCESS_DENIED));
-        return post;
     }
+
+    // 1. 낙관적 락을 사용한 좋아요 증가
+    @Transactional
+    public Long increaseLikesOptimistic(Long postId) {
+        int retryCount = 0;
+        while (retryCount < 100) {
+            try {
+                Post post = postRepository.findById(postId)
+                        .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.POST_NOT_FOUND));
+                post.increaseLikes();
+                // @Transactional에 의해 자동으로 저장됩니다.
+                return post.getLikes();
+            } catch (OptimisticLockingFailureException e) {
+                retryCount++;
+                if (retryCount == 3) {
+                    throw new RuntimeException("낙관적 락 재시도 실패", e);
+                }
+            }
+        }
+        throw new RuntimeException("낙관적 락 재시도 실패");
+    }
+
+    // 2. 비관적 락을 사용한 좋아요 증가
+    @Transactional
+    public Long increaseLikesPessimistic(Long postId) {
+        Post post = postRepository.findByIdWithPessimisticLock(postId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.POST_NOT_FOUND));
+        post.increaseLikes();
+        // @Transactional에 의해 자동으로 저장됩니다.
+        return post.getLikes();
+    }
+
+    // 3. Redis를 사용한 좋아요 증가
+    public Long increaseLikesRedis(Long postId) {
+        String key = "post:likes:" + postId;
+        ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
+        return valueOps.increment(key);
+    }
+
 }

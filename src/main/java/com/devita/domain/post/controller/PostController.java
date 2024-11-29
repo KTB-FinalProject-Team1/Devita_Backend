@@ -65,4 +65,24 @@ public class PostController {
 
         return ApiResponse.success(posts);
     }
+    // 1. 낙관적 락을 사용한 좋아요 증가
+    @PostMapping("/post/{postId}/like/optimistic")
+    public ApiResponse<Long> increaseLikesOptimistic(@PathVariable Long postId) {
+        Long likes = postService.increaseLikesOptimistic(postId);
+        return ApiResponse.success(likes);
+    }
+
+    // 2. 비관적 락을 사용한 좋아요 증가
+    @PostMapping("/post/{postId}/like/pessimistic")
+    public ApiResponse<Long> increaseLikesPessimistic(@PathVariable Long postId) {
+        Long likes = postService.increaseLikesPessimistic(postId);
+        return ApiResponse.success(likes);
+    }
+
+    // 3. Redis를 사용한 좋아요 증가
+    @PostMapping("/post/{postId}/like/redis")
+    public ApiResponse<Long> increaseLikesRedis(@PathVariable Long postId) {
+        Long likes = postService.increaseLikesRedis(postId);
+        return ApiResponse.success(likes);
+    }
 }
