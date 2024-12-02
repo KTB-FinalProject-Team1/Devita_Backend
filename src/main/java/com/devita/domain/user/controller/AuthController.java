@@ -24,7 +24,7 @@ public class AuthController {
         UserAuthResponse response = authService.refreshUserAuth(refreshToken);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + response.getAccessToken());
+        headers.add("Authorization", "Bearer " + response.accessToken());
 
         return ResponseEntity.ok()
                 .headers(headers)
@@ -36,10 +36,10 @@ public class AuthController {
         UserAuthResponse response = authService.refreshUserAuth(refreshToken);
 
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + response.getAccessToken());
+        headers.add("Authorization", "Bearer " + response.accessToken());
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(ApiResponse.success(response.getAccessToken()));
+                .body(ApiResponse.success(response.accessToken()));
     }
 }

@@ -74,7 +74,7 @@ public class MissionService {
                     FreeMissionAiResDTO.class
             );
 
-            return response != null ? response.getMissions() : Collections.emptyList();
+            return response != null ? response.missions() : Collections.emptyList();
         } catch (RestClientException e) {
             log.error("Failed to request free mission from AI server", e);
             throw new AiServerConnectionException(ErrorCode.AI_SERVER_ERROR);
@@ -92,7 +92,7 @@ public class MissionService {
         Todo todo = Todo.builder()
                 .user(user)
                 .category(category)
-                .title(freeSaveReqDTO.getMissionTitle())
+                .title(freeSaveReqDTO.missionTitle())
                 .status(false)
                 .date(LocalDate.now(KOREA_ZONE))
                 .build();

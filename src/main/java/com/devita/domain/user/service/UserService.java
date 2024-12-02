@@ -23,7 +23,7 @@ public class UserService {
     @Transactional
     public void updatePreferredCategories(Long userId, PreferredCategoryRequest request) {
         User user = getUserById(userId);
-        user.updatePreferredCategories(request.getCategories());
+        user.updatePreferredCategories(request.categories());
     }
 
     public PreferredCategoryResponse getPreferredCategories(Long userId) {
@@ -42,6 +42,6 @@ public class UserService {
         Reward reward = rewardRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.REWARD_NOT_FOUND));
 
-        return new UserInfoResponse(user, reward);
+        return new UserInfoResponse(user.getNickname(), reward.getExperience(), reward.getNutrition());
     }
 }
