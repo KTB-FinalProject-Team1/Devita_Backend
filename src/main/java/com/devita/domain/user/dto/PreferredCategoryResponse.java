@@ -6,9 +6,6 @@ import lombok.Data;
 
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-public class PreferredCategoryResponse {
-    private List<PreferredCategory> categories;
-
-}
+public record PreferredCategoryResponse(
+        List<PreferredCategory> categories
+) {}

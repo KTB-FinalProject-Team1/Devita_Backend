@@ -133,20 +133,20 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             log.info(dailyMissionCategory.toString());
 
             // AI 서버에 Daily Mission 요청
-            DailyMissionAiResDTO missionResponse = new DailyMissionAiResDTO("다형성 공부하기");
+            DailyMissionAiResDTO missionResponse = new DailyMissionAiResDTO("1", "1");
 
             // 미션 생성
             Todo mission = Todo.builder()
                     .user(user)
                     .category(dailyMissionCategory)
-                    .title(missionResponse.getMissionTitle())
+                    .title(missionResponse.missionTitle())
                     .status(false)
                     .date(LocalDate.now(KOREA_ZONE))
                     .build();
 
 
             todoRepository.save(mission);
-            log.info("사용자 {}의 미션 생성 완료: {}", user.getId(), missionResponse.getMissionTitle());
+            log.info("사용자 {}의 미션 생성 완료: {}", user.getId(), missionResponse.missionTitle());
 
         } catch (ResourceNotFoundException e) {
             log.error("사용자 {}의 강제 미션 카테고리를 찾을 수 없습니다.", user.getId());
