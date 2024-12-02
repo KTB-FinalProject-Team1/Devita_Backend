@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         ECR_REGISTRY = '860195224276.dkr.ecr.ap-northeast-2.amazonaws.com'
-        ECR_REPO_NAME = 'devita_ecr'
+        ECR_REPO_NAME = 'devita_deploy_ecr'
         IMAGE_TAG = 'latest_back'
         AWS_REGION = 'ap-northeast-2'
         AWS_CREDENTIALS = credentials('AwsCredentials')
