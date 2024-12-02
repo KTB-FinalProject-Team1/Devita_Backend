@@ -92,6 +92,7 @@ public class MissionService {
         Todo todo = Todo.builder()
                 .user(user)
                 .category(category)
+                .missionCategory(freeSaveReqDTO.getMissionCategory())
                 .title(freeSaveReqDTO.getMissionTitle())
                 .status(false)
                 .date(LocalDate.now(KOREA_ZONE))

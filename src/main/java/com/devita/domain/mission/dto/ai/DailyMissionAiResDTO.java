@@ -7,4 +7,5 @@ import lombok.Data;
 @AllArgsConstructor
 public class DailyMissionAiResDTO {
     private String missionTitle;
+    private String missionCategory;
 }

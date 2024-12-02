@@ -24,14 +24,17 @@ public class Todo extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    private String missionCategory;
+
     private String title;
     private Boolean status;
     private LocalDate date;
 
     @Builder
-    private Todo(User user, Category category, String title, Boolean status, LocalDate date) {
+    private Todo(User user, Category category, String missionCategory, String title, Boolean status, LocalDate date) {
         this.user = user;
         this.category = category;
+        this.missionCategory = missionCategory;
         this.title = title;
         this.status = status;
         this.date = date;

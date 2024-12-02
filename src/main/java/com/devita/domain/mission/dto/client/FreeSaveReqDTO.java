@@ -6,4 +6,5 @@ import lombok.Data;
 @Data
 public class FreeSaveReqDTO {
     private String missionTitle;
+    private String missionCategory;
 }

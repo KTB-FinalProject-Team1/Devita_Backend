@@ -7,4 +7,5 @@ import lombok.*;
 public class MissionAiResDTO {
     private int level;
     private String missionTitle;
+    private String missionCategory;
 }
