@@ -3,16 +3,14 @@ package com.devita.domain.post.domain;
 import com.devita.common.entity.BaseEntity;
 import com.devita.domain.user.domain.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
 @NoArgsConstructor
 public class Post extends BaseEntity {
     @Id
+    @Setter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
