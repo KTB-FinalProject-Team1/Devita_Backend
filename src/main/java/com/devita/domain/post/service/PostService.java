@@ -34,8 +34,8 @@ public class PostService {
 
         Post post = Post.builder()
                 .writer(writer)
-                .title(postReqDTO.getTitle())
-                .description(postReqDTO.getDescription())
+                .title(postReqDTO.title())
+                .description(postReqDTO.description())
                 .build();
 
         return postRepository.save(post);
@@ -52,7 +52,7 @@ public class PostService {
     public PostResDTO updatePost(Long userId, Long postId, PostReqDTO postReqDTO) {
         Post post = validateWriter(userId, postId);
 
-        post.updatePost(postReqDTO.getTitle(), postReqDTO.getDescription());
+        post.updatePost(postReqDTO.title(), postReqDTO.description());
         postRepository.save(post);
 
         return new PostResDTO(postId, post.getWriter().getNickname(), post.getTitle(), post.getDescription(), post.getLikes(), post.getViews());

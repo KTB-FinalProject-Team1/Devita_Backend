@@ -1,14 +1,13 @@
 package com.devita.domain.post.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Builder;
 
-@Data
-@AllArgsConstructor
-public class PostsResDTO {
-    private Long id;
-    private String title;
-    private String description;
-    private Long likes;
-    private Long views;
+@Builder
+public record PostsResDTO(
+        Long id,
+        String title,
+        String description,
+        Long likes,
+        Long views
+) {
 }
