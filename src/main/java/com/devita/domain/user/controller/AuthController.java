@@ -19,7 +19,8 @@ public class AuthController {
 
 
     @PostMapping("/user/info")
-    public ResponseEntity<ApiResponse<UserAuthResponse>> sendUserInitData(@CookieValue("refreshToken") String refreshToken) {
+//    public ResponseEntity<ApiResponse<UserAuthResponse>> sendUserInitData(@CookieValue("refreshToken") String refreshToken) {
+    public ResponseEntity<ApiResponse<UserAuthResponse>> sendUserInitData(@RequestHeader("Refresh") String refreshToken) {
         log.info("로그인 성공 후 유저 정보를 반환합니다.(액세스 토큰, 닉네임 ...)");
         UserAuthResponse response = authService.refreshUserAuth(refreshToken);
 
@@ -32,7 +33,8 @@ public class AuthController {
     }
 
     @PostMapping("/reissue")
-    public ResponseEntity<ApiResponse<String>> refreshAccessToken(@CookieValue("refreshToken") String refreshToken) {
+//    public ResponseEntity<ApiResponse<String>> refreshAccessToken(@CookieValue("refreshToken") String refreshToken) {
+    public ResponseEntity<ApiResponse<String>> refreshAccessToken(@RequestHeader("Refresh") String refreshToken) {
         UserAuthResponse response = authService.refreshUserAuth(refreshToken);
 
         HttpHeaders headers = new HttpHeaders();

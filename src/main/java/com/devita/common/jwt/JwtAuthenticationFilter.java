@@ -9,7 +9,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
@@ -107,6 +106,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/v3/api-docs") ||
                 requestURI.startsWith("/api-docs") ||
                 requestURI.startsWith("/webjars") ||
-                requestURI.startsWith("/api/v1/auth/user/info");
+                requestURI.startsWith("/api/v1/auth/user/info") ||
+                requestURI.startsWith("/api/v1/auth/reissue");
     }
 }
