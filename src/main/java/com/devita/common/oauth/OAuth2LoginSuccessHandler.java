@@ -42,7 +42,7 @@ public class OAuth2LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHan
                 () -> new OAuth2AuthenticationException(ErrorCode.USER_NOT_FOUND.getMessage())
         );
 
-        jwtTokenProvider.createRefreshToken(response, user.getId());
+//        jwtTokenProvider.createRefreshToken(response, user.getId());
 
         getRedirectStrategy().sendRedirect(request, response,  redirectUrl);
     }

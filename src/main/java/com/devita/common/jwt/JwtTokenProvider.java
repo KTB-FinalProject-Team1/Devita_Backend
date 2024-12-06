@@ -68,7 +68,7 @@ public class JwtTokenProvider {
         refreshTokenService.saveRefreshToken(userId, refreshToken, refreshTokenValidityInMilliseconds);
 
         // 헤더에 리프레시 토큰 저장
-        addRefreshTokenHeader(response, refreshToken);
+//        addRefreshTokenHeader(response, refreshToken);
 
 //        // 쿠키에 리프레시 토큰 저장
 //        addRefreshTokenCookie(response, refreshToken);

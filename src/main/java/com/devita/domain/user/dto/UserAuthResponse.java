@@ -7,6 +7,7 @@ import java.util.List;
 
 @Builder
 public record UserAuthResponse(
+        String refreshToken,
         String accessToken,
         String email,
         String nickname,
