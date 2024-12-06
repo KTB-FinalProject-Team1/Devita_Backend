@@ -9,16 +9,15 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -43,17 +42,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             log.info(requestURI + ": 액세스 토큰이 필요없는 작업입니다.");
             // 쿠키 배열에서 리프레시 토큰을 찾기
-            if (request.getCookies() != null) {
-                for (Cookie cookie : request.getCookies()) {
-                    if ("refreshToken".equals(cookie.getName())) {
-                        String refreshToken = cookie.getValue();
-                        log.info("리프레시 토큰: " + refreshToken);
-                        break;
-                    }
-                }
-            } else {
-                log.info("쿠키가 없습니다.");
-            }
+//            if (request.getCookies() != null) {
+//                for (Cookie cookie : request.getCookies()) {
+//                    if ("refreshToken".equals(cookie.getName())) {
+//                        String refreshToken = cookie.getValue();
+//                        log.info("리프레시 토큰: " + refreshToken);
+//                        break;
+//                    }
+//                }
+//            } else {
+//                log.info("쿠키가 없습니다.");
+//            }
 
             filterChain.doFilter(request, response);
             return;
@@ -107,6 +106,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/v3/api-docs") ||
                 requestURI.startsWith("/api-docs") ||
                 requestURI.startsWith("/webjars") ||
-                requestURI.startsWith("/api/v1/auth/user/info");
+                requestURI.startsWith("/api/v1/auth/user/info") ||
+                requestURI.startsWith("/api/v1/auth/reissue") ||
+                requestURI.startsWith("/actuator/metrics") ||
+                requestURI.startsWith("/favicon.ico") ||
+                requestURI.startsWith("/actuator/prometheus");
     }
 }

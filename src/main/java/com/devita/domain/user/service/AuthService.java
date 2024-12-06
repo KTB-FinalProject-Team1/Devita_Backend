@@ -8,8 +8,10 @@ import com.devita.domain.category.service.CategoryService;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.dto.UserAuthResponse;
 import com.devita.domain.user.repository.UserRepository;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +23,12 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final CategoryService categoryService;
+
+    public UserAuthResponse issueAccessAndRefreshTokens(HttpServletResponse response, Long userId) {
+        String refreshToken = jwtTokenProvider.createRefreshToken(response, userId);
+
+        return refreshUserAuth(refreshToken);
+    }
 
     public UserAuthResponse refreshUserAuth(String refreshToken) {
         try {
@@ -37,6 +45,7 @@ public class AuthService {
 
             // 응답 데이터 생성
             return UserAuthResponse.builder()
+                    .refreshToken(refreshToken)     // 수정 필요
                     .accessToken(newAccessToken)
                     .email(user.getEmail())
                     .nickname(user.getNickname())
