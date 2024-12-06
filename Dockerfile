@@ -1,5 +1,5 @@
-# Step 1: Java 17 기반 Debian 이미지 사용
-FROM openjdk:17-jdk-slim as build
+# Step 1: Java 21 기반 이미지 사용
+FROM openjdk:21-jdk-slim as build
 
 # Step 2: 기본 유틸리티 설치 및 MariaDB, Redis 설치
 RUN apt-get update && apt-get install -y \
