@@ -43,6 +43,19 @@ public class MissionController {
         return ApiResponse.success(freeMissions);
     }
 
+    @PostMapping("/test")
+    public ApiResponse<List<MissionAiResDTO>> getTestMission(@AuthenticationPrincipal Long userId, @RequestBody FreeMissionReqDTO freeMissionReqDTO){
+        List<MissionAiResDTO> freeMissions = missionService.requestTestMission(userId, freeMissionReqDTO.subCategory());
+
+        return ApiResponse.success(freeMissions);
+    }
+
+    @PostMapping("/test/t")
+    public ApiResponse<String> getTesttMission(@AuthenticationPrincipal Long userId, @RequestBody FreeMissionReqDTO freeMissionReqDTO){
+
+        return ApiResponse.success("132");
+    }
+
     @PostMapping("/free/save")
     public ApiResponse<Long> saveFreeMission(@AuthenticationPrincipal Long userId, @RequestBody FreeSaveReqDTO freeSaveReqDTO){
         Long todoId = missionService.saveFreeMission(userId, freeSaveReqDTO).getId();
