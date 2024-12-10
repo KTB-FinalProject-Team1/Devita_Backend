@@ -30,6 +30,9 @@ public class Post extends BaseEntity {
     @Column(columnDefinition = "bigint default 0")
     private Long views = 0L;
 
+    @Version
+    private Long version;
+
     @Builder
     private Post(User writer, String title, String description) {
         this.writer = writer;
@@ -44,5 +47,9 @@ public class Post extends BaseEntity {
 
     public void increaseView() {
         views += 1;
+    }
+
+    public void increaseLikes() {
+        this.likes += 1;
     }
 }

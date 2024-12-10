@@ -1,6 +1,7 @@
 package com.devita.domain.todo.controller;
 
 import com.devita.common.response.ApiResponse;
+import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.dto.CalenderDTO;
 import com.devita.domain.todo.dto.TodoReqDTO;
 import com.devita.domain.todo.service.TodoService;

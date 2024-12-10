@@ -12,11 +12,15 @@ import com.devita.domain.user.domain.User;
 import com.devita.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -27,6 +31,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final StringRedisTemplate redisTemplate;
 
     // 게시물 생성
     public Post addPost(Long userId, PostReqDTO postReqDTO) {
@@ -106,9 +111,15 @@ public class PostService {
 
     // 작성자 유무 확인
     private Post validateWriter(Long userId, Long postId) {
-        Post post = postRepository.findById(postId)
+        return postRepository.findById(postId)
                 .filter(p -> p.getWriter().getId().equals(userId))
                 .orElseThrow(() -> new AccessDeniedException(ErrorCode.ACCESS_DENIED));
-        return post;
     }
+
+    public Long increaseLikesRedis(Long postId) {
+        String key = "post:likes:" + postId;
+        ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
+        return valueOps.increment(key);
+    }
+
 }

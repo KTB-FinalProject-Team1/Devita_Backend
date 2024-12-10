@@ -1,7 +1,11 @@
 package com.devita.domain.mission.dto.ai;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import java.util.List;
 
-public record FreeMissionAiResDTO(
-        List<MissionAiResDTO> missions
-) {}
+@Data
+public class FreeMissionAiResDTO {
+    private List<MissionAiResDTO> missions;
+}

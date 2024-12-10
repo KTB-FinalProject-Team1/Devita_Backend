@@ -100,6 +100,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         return null;
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String requestURI = request.getRequestURI();
+        return isRequest(requestURI);
+    }
+
     private boolean isRequest(String requestURI) {
         return requestURI.startsWith("/swagger-resources") ||
                 requestURI.startsWith("/swagger-ui") ||

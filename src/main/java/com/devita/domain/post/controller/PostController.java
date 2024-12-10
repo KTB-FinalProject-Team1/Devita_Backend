@@ -65,4 +65,10 @@ public class PostController {
 
         return ApiResponse.success(posts);
     }
+
+    @PostMapping("/post/{postId}/like/redis")
+    public ApiResponse<Long> increaseLikesRedis(@PathVariable Long postId) {
+        Long likes = postService.increaseLikesRedis(postId);
+        return ApiResponse.success(likes);
+    }
 }

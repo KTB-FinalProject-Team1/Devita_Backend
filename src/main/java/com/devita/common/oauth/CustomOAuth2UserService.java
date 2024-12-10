@@ -133,7 +133,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             log.info(dailyMissionCategory.toString());
 
             // AI 서버에 Daily Mission 요청
-            DailyMissionAiResDTO missionResponse = new DailyMissionAiResDTO("다형성 공부하기");
+            DailyMissionAiResDTO missionResponse = new DailyMissionAiResDTO("1", "1");
 
             // 미션 생성
             Todo mission = Todo.builder()
