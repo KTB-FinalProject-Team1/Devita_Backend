@@ -17,6 +17,7 @@ import java.util.List;
 @ToString
 public class Category extends BaseEntity {
     @Id
+    @Setter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

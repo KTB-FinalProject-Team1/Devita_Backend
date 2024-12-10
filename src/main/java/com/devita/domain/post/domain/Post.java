@@ -10,6 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 public class Post extends BaseEntity {
     @Id
+    @Setter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

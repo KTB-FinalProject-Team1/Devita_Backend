@@ -1,9 +1,10 @@
 package com.devita.domain.post.dto;
 
-import lombok.Data;
+import lombok.Builder;
 
-@Data
-public class PostReqDTO {
-    private String title;
-    private String description;
+@Builder
+public record PostReqDTO(
+        String title,
+        String description
+) {
 }

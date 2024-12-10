@@ -49,6 +49,7 @@ public class SecurityConfig {
             "/oauth2/**",
             "/api/v1/auth/access",
             "/actuator/**",
+            "/favicon.ico"
     };
 
     @Bean
