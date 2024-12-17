@@ -3,18 +3,30 @@ package com.devita.domain.user.service;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.SecurityTokenException;
 import com.devita.common.jwt.JwtTokenProvider;
+import com.devita.domain.category.dto.CategoryReqDTO;
 import com.devita.domain.category.dto.CategoryResDTO;
 import com.devita.domain.category.service.CategoryService;
+import com.devita.domain.character.domain.Reward;
+import com.devita.domain.character.repository.RewardRepository;
+import com.devita.domain.user.domain.AuthProvider;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.dto.UserAuthResponse;
 import com.devita.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -23,9 +35,69 @@ public class AuthService {
     private final JwtTokenProvider jwtTokenProvider;
     private final UserRepository userRepository;
     private final CategoryService categoryService;
+    private final RewardRepository rewardRepository;
 
-    public UserAuthResponse issueAccessAndRefreshTokens(HttpServletResponse response, Long userId) {
-        String refreshToken = jwtTokenProvider.createRefreshToken(response, userId);
+    @Transactional
+    public User loadUser(Map<String, Object> attributes){
+        Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
+        Map<String, Object> properties = (Map<String, Object>) attributes.get("properties");
+
+        String email = (String) kakaoAccount.get("email");
+        String nickname = (String) properties.get("nickname");
+        String profileImage = (String) properties.get("profile_image");
+
+        if (email == null) {
+            throw new OAuth2AuthenticationException(ErrorCode.TOKEN_NOT_FOUND.getMessage());
+        }
+
+        User user = userRepository.findByEmail(email)
+                .orElseGet(() -> {
+                    User newUser = User.builder()
+                            .email(email)
+                            .nickname(nickname)
+                            .provider(AuthProvider.KAKAO)
+                            .profileImage(profileImage)
+                            .build();
+
+                    User savedUser = userRepository.save(newUser);
+
+                    Reward reward = Reward.builder()
+                            .user(savedUser)
+                            .experience(0)
+                            .nutrition(0)
+                            .build();
+                    rewardRepository.save(reward);
+
+                    createDefaultCategories(savedUser.getId());
+
+                    return savedUser;
+                });
+
+        user.updateNickname(nickname);
+        userRepository.save(user);
+
+        log.info("유저 로그인 성공!");
+
+        return user;
+
+    }
+
+    private void createDefaultCategories(Long userId) {
+        String[] defaultCategories = {"일반", "일일 미션", "자율 미션"};
+        String[] defaultColors = {"#6DC2FF", "#086BFF", "#7DB1FF"};
+
+        for (int i = 0; i < defaultCategories.length; i++) {
+            CategoryReqDTO categoryReqDto = CategoryReqDTO.builder()
+                    .name(defaultCategories[i])
+                    .color(defaultColors[i])
+                    .build();
+
+            categoryService.createCategory(userId, categoryReqDto);
+        }
+    }
+
+    public UserAuthResponse issueAccessAndRefreshTokens(Long userId) {
+        String refreshToken = jwtTokenProvider.createRefreshToken(userId);
 
         return refreshUserAuth(refreshToken);
     }
