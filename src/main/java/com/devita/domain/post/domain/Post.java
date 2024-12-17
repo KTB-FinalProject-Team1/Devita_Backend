@@ -5,6 +5,8 @@ import com.devita.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -17,6 +19,9 @@ public class Post extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writer_id")
     private User writer;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Image> images;
 
     @Column(nullable = false)
     private String title;

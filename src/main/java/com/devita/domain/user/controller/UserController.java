@@ -3,6 +3,7 @@ package com.devita.domain.user.controller;
 import com.devita.common.response.ApiResponse;
 import com.devita.domain.user.dto.PreferredCategoryRequest;
 import com.devita.domain.user.dto.PreferredCategoryResponse;
+import com.devita.domain.user.dto.UpdateUserRequest;
 import com.devita.domain.user.dto.UserInfoResponse;
 import com.devita.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +30,11 @@ public class UserController {
     @GetMapping
     public ApiResponse<UserInfoResponse> getUserInfo(@AuthenticationPrincipal Long userId) {
         return ApiResponse.success(userService.getUserInfo(userId));
+    }
+
+    @PutMapping("/profile")
+    public ApiResponse<Void> updateProfile(@AuthenticationPrincipal Long userId, @RequestBody UpdateUserRequest request) {
+        userService.updateUserProfile(userId, request);
+        return ApiResponse.success(null);
     }
 }
