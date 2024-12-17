@@ -4,6 +4,7 @@ import com.devita.common.entity.BaseEntity;
 import com.devita.domain.category.domain.Category;
 import com.devita.domain.post.domain.Post;
 import com.devita.domain.todo.domain.Todo;
+import com.devita.domain.follow.domain.Follow;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,7 +12,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,6 +55,25 @@ public class User extends BaseEntity {
     private List<PreferredCategory> preferredCategories = new ArrayList<>();
 
     private String profileImage;
+
+    @OneToMany(mappedBy = "follower", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followings = new ArrayList<>();  // 내가 팔로우하는 사람들
+
+    @OneToMany(mappedBy = "following", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Follow> followers = new ArrayList<>();   // 나를 팔로우하는 사람들
+
+    public void follow(User targetUser) {
+        Follow follow = Follow.builder()
+                .follower(this)
+                .following(targetUser)
+                .build();
+        this.followings.add(follow);
+    }
+
+    public void unfollow(User targetUser) {
+        this.followings.removeIf(follow ->
+                follow.getFollowing().getId().equals(targetUser.getId()));
+    }
 
     @Builder
     public User(String email, String nickname, AuthProvider provider, String profileImage) {

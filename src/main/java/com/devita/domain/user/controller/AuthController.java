@@ -1,17 +1,15 @@
 package com.devita.domain.user.controller;
 
 import com.devita.common.response.ApiResponse;
-import com.devita.domain.user.domain.AuthDTO;
+import com.devita.domain.user.dto.AuthDTO;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.dto.UserAuthResponse;
 import com.devita.domain.user.service.AuthService;
 import com.devita.domain.user.service.KakaoUserInfoService;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -30,7 +28,7 @@ public class AuthController {
     public ApiResponse<UserAuthResponse> sendUserInitData(@RequestBody AuthDTO authDTO) {
         log.info("로그인 성공 후 유저 정보를 반환합니다.(액세스 토큰, 닉네임 ...)");
 
-        Map<String, Object> userInfo = kakaoUserInfoService.getUserInfo(authDTO.getKakaoAccessToken());
+        Map<String, Object> userInfo = kakaoUserInfoService.getUserInfoByCode(authDTO.getKakaoAccessToken());
         User user = authService.loadUser(userInfo);
         UserAuthResponse userAuthResponse = authService.issueAccessAndRefreshTokens(user.getId());
 
