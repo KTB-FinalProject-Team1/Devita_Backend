@@ -41,10 +41,10 @@ public class JwtTokenProvider {
     }
 
     // 리프레시 토큰 생성
-    public String createRefreshToken(HttpServletResponse response, Long userId) {
+    public String createRefreshToken(Long userId) {
         String refreshToken = createToken(userId, refreshTokenValidityInMilliseconds, refreshTokenSecret);
 
-        storeRefreshToken(response, userId, refreshToken);
+        storeRefreshToken(userId, refreshToken);
 
         return refreshToken;
     }
@@ -63,34 +63,9 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public void storeRefreshToken(HttpServletResponse response, Long userId, String refreshToken) {
+    public void storeRefreshToken(Long userId, String refreshToken) {
         // Redis에 리프레시 토큰 저장
         refreshTokenService.saveRefreshToken(userId, refreshToken, refreshTokenValidityInMilliseconds);
-
-        // 헤더에 리프레시 토큰 저장
-//        addRefreshTokenHeader(response, refreshToken);
-
-//        // 쿠키에 리프레시 토큰 저장
-//        addRefreshTokenCookie(response, refreshToken);
-    }
-
-    // 리프레시 토큰 헤더에 추가
-    private void addRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
-        String tokenValue = "Bearer " + refreshToken;
-        response.setHeader("Refresh", tokenValue);
-        log.info("리프레시 토큰 헤더 추가 완료: " + refreshToken);
-    }
-
-    // 리프레시 토큰 쿠키 생성 및 설정
-    private void addRefreshTokenCookie(HttpServletResponse response, String refreshToken) {
-        ResponseCookie cookie = ResponseCookie.from("refreshToken", refreshToken)
-                .maxAge((int) (refreshTokenValidityInMilliseconds / 1000))
-                .sameSite("None")
-                .secure(true)
-                .path("/")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 
     // 리프레시 토큰 검증

@@ -1,15 +1,18 @@
 package com.devita.domain.user.controller;
 
 import com.devita.common.response.ApiResponse;
+import com.devita.domain.user.dto.AuthDTO;
+import com.devita.domain.user.domain.User;
 import com.devita.domain.user.dto.UserAuthResponse;
 import com.devita.domain.user.service.AuthService;
-import jakarta.servlet.http.HttpServletResponse;
+import com.devita.domain.user.service.KakaoUserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,27 +21,21 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
 
     private final AuthService authService;
+    private final KakaoUserInfoService kakaoUserInfoService;
 
 
     @PostMapping("/user/info")
-//    public ResponseEntity<ApiResponse<UserAuthResponse>> sendUserInitData(@CookieValue("refreshToken") String refreshToken) {
-    public ResponseEntity<ApiResponse<UserAuthResponse>> sendUserInitData(HttpServletResponse response, @RequestHeader("userId") Long userId) {
+    public ApiResponse<UserAuthResponse> sendUserInitData(@RequestBody AuthDTO authDTO) {
         log.info("로그인 성공 후 유저 정보를 반환합니다.(액세스 토큰, 닉네임 ...)");
 
-//        UserAuthResponse response = authService.refreshUserAuth(refreshToken);
-        log.info("유저 아이디 " + userId);
-        UserAuthResponse userAuthResponse = authService.issueAccessAndRefreshTokens(response, userId);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Refresh", "Bearer " + userAuthResponse.refreshToken());
-        headers.add("Authorization", "Bearer " + userAuthResponse.accessToken());
+        Map<String, Object> userInfo = kakaoUserInfoService.getUserInfoByCode(authDTO.getKakaoAccessToken());
+        User user = authService.loadUser(userInfo);
+        UserAuthResponse userAuthResponse = authService.issueAccessAndRefreshTokens(user.getId());
 
         log.info("userAuthResponse.refreshToken: " + userAuthResponse.refreshToken());
         log.info("userAuthResponse.accessToken: " + userAuthResponse.accessToken());
 
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(ApiResponse.success(userAuthResponse));
+        return ApiResponse.success(userAuthResponse);
     }
 
     @PostMapping("/reissue")

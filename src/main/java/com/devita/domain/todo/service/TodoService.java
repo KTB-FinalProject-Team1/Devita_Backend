@@ -5,8 +5,11 @@ import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
 import com.devita.domain.category.domain.Category;
 import com.devita.domain.character.service.RewardService;
+import com.devita.domain.mission.dto.ai.FreeMissionAiReqDTO;
+import com.devita.domain.mission.dto.ai.FreeMissionAiResDTO;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.dto.CalenderDTO;
+import com.devita.domain.todo.dto.TodoAIReqDTO;
 import com.devita.domain.todo.dto.TodoReqDTO;
 import com.devita.domain.category.repository.CategoryRepository;
 import com.devita.domain.todo.repository.TodoRepository;
@@ -14,8 +17,10 @@ import com.devita.domain.user.domain.User;
 import com.devita.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
@@ -26,10 +31,16 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TodoService {
 
+    private final RestTemplate restTemplate;
     private final TodoRepository todoRepository;
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final RewardService rewardService;
+
+    @Value("${ai.address}")
+    private String aiAddress;
+
+    private static final String MISSION_SAVE_API = "/ai/v1/mission/save";
 
     // 할 일 추가
     public Todo addTodo(Long userId, TodoReqDTO todoReqDTO) {
@@ -92,6 +103,17 @@ public class TodoService {
                 log.warn("보상 지급 실패 {}: {}", todoId, e.getMessage());
             }
         }
+    }
+
+    // 미션 완료 시 AI에 보낼 로직 임시 구현
+    private void sendFinishedMission(Todo todo, Long userId){
+        TodoAIReqDTO request = new TodoAIReqDTO(todo.getTitle(), todo.getDate(), todo.getCategory().getName(), todo.getMissionCategory(), userId);
+
+        restTemplate.postForObject(
+                aiAddress + MISSION_SAVE_API,
+                request,
+                FreeMissionAiResDTO.class
+        );
     }
 
     public List<CalenderDTO> getCalendar(Long userId, String viewType) {
