@@ -7,6 +7,7 @@ import com.devita.domain.character.repository.RewardRepository;
 import com.devita.domain.user.domain.User;
 import com.devita.domain.user.dto.PreferredCategoryRequest;
 import com.devita.domain.user.dto.PreferredCategoryResponse;
+import com.devita.domain.user.dto.UpdateUserRequest;
 import com.devita.domain.user.dto.UserInfoResponse;
 import com.devita.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -43,5 +44,18 @@ public class UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.REWARD_NOT_FOUND));
 
         return new UserInfoResponse(user.getNickname(), reward.getExperience(), reward.getNutrition());
+    }
+
+    @Transactional
+    public void updateUserProfile(Long userId, UpdateUserRequest request) {
+        User user = getUserById(userId);
+
+        if (request.nickname() != null) {
+            user.updateNickname(request.nickname());
+        }
+
+        if (request.profileImage() != null) {
+            user.updateProfileImage(request.profileImage());
+        }
     }
 }

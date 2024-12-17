@@ -28,10 +28,10 @@ public class PostController {
 
     // 게시물 삭제
     @DeleteMapping("/post/{postId}")
-    public ApiResponse<Void> deletePost(@AuthenticationPrincipal Long userId, @PathVariable Long postId) {
-        postService.deletePost(userId, postId);
+    public ApiResponse<List<String>> deletePost(@AuthenticationPrincipal Long userId, @PathVariable Long postId) {
+        List<String> imageUrls = postService.deletePost(userId, postId);
 
-        return ApiResponse.success(null);
+        return ApiResponse.success(imageUrls);
     }
 
     // 게시물 수정

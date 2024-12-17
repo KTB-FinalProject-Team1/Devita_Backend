@@ -3,6 +3,7 @@ package com.devita.domain.post.service;
 import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
+import com.devita.domain.post.domain.Image;
 import com.devita.domain.post.domain.Post;
 import com.devita.domain.post.dto.PostReqDTO;
 import com.devita.domain.post.dto.PostResDTO;
@@ -38,14 +39,28 @@ public class PostService {
                 .description(postReqDTO.description())
                 .build();
 
+        if (postReqDTO.imageUrls() != null && !postReqDTO.imageUrls().isEmpty()) {
+            List<Image> images = postReqDTO.imageUrls().stream()
+                    .map(url -> Image.builder()
+                            .post(post)
+                            .url(url)
+                            .build())
+                    .toList();
+            post.getImages().addAll(images);
+        }
+
         return postRepository.save(post);
     }
 
     // 게시물 삭제
-    public void deletePost(Long userId, Long postId) {
+    public List<String> deletePost(Long userId, Long postId) {
         Post post = validateWriter(userId, postId);
+        List<String> imageUrls = post.getImages().stream()
+                .map(Image::getUrl)
+                .toList();
 
         postRepository.delete(post);
+        return imageUrls;
     }
 
     // 게시물 수정
@@ -53,9 +68,28 @@ public class PostService {
         Post post = validateWriter(userId, postId);
 
         post.updatePost(postReqDTO.title(), postReqDTO.description());
+
+        post.getImages().clear();
+        if (postReqDTO.imageUrls() != null && !postReqDTO.imageUrls().isEmpty()) {
+            List<Image> newImages = postReqDTO.imageUrls().stream()
+                    .map(url -> Image.builder()
+                            .post(post)
+                            .url(url)
+                            .build())
+                    .toList();
+        }
+
         postRepository.save(post);
 
-        return new PostResDTO(postId, post.getWriter().getNickname(), post.getTitle(), post.getDescription(), post.getLikes(), post.getViews());
+        return new PostResDTO(
+                postId,
+                post.getWriter().getNickname(),
+                post.getTitle(),
+                post.getDescription(),
+                post.getImages().stream().map(Image::getUrl).toList(),
+                post.getLikes(),
+                post.getViews()
+        );
     }
 
     // 게시물 페이징 조회
@@ -64,7 +98,14 @@ public class PostService {
         Page<Post> postPage = postRepository.findAll(pageable);
 
         return postPage.getContent().stream()
-                .map(post -> new PostsResDTO(post.getId(), post.getTitle(), post.getDescription(), post.getLikes(), post.getViews()))
+                .map(post -> new PostsResDTO(
+                        post.getId(),
+                        post.getTitle(),
+                        post.getDescription(),
+                        post.getImages().stream().map(Image::getUrl).toList(),
+                        post.getLikes(),
+                        post.getViews())
+                )
                 .toList();
     }
 
@@ -78,7 +119,15 @@ public class PostService {
             postRepository.save(post);
         }
 
-        return new PostResDTO(postId, post.getWriter().getNickname(), post.getTitle(), post.getDescription(), post.getLikes(), post.getViews());
+        return new PostResDTO(
+                postId,
+                post.getWriter().getNickname(),
+                post.getTitle(),
+                post.getDescription(),
+                post.getImages().stream().map(Image::getUrl).toList(),
+                post.getLikes(),
+                post.getViews()
+        );
     }
 
     // 작성한 게시물 조회
@@ -93,6 +142,7 @@ public class PostService {
                         post.getId(),
                         post.getTitle(),
                         post.getDescription(),
+                        post.getImages().stream().map(Image::getUrl).toList(),
                         post.getLikes(),
                         post.getViews()
                 ))

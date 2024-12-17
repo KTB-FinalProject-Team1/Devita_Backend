@@ -71,6 +71,10 @@ public class User extends BaseEntity {
         this.nickname = nickname;
     }
 
+    public void updateProfileImage(String profileImage) {
+        this.profileImage = profileImage;
+    }
+
     public void updatePreferredCategories(List<PreferredCategory> categories) {
         this.preferredCategories.clear();
         this.preferredCategories.addAll(categories);
