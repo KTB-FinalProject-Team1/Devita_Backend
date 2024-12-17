@@ -1,4 +1,4 @@
-package com.devita.domain.user.domain;
+package com.devita.domain.user.dto;
 
 import lombok.Getter;
 
