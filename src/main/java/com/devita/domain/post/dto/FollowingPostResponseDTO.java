@@ -11,6 +11,7 @@ public record FollowingPostResponseDTO(
         String description,
         Long writerId,
         String writerNickname,
+        String writerImageUrl,
         Long likes,
         Long views,
         LocalDateTime createdAt,

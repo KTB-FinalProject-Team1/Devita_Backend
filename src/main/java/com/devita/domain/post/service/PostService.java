@@ -11,7 +11,6 @@ import com.devita.domain.user.domain.User;
 import com.devita.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +22,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
@@ -100,22 +98,6 @@ public class PostService {
         );
     }
 
-    // 게시물 페이징 조회
-    public List<PostsResDTO> getPosts(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size); // 페이지 번호와 페이지 크기를 기반으로 Pageable 객체 생성
-        Page<Post> postPage = postRepository.findAll(pageable);
-
-        return postPage.getContent().stream()
-                .map(post -> new PostsResDTO(
-                        post.getId(),
-                        post.getTitle(),
-                        post.getDescription(),
-                        post.getImages().stream().map(Image::getUrl).toList(),
-                        getLikeCount(post.getId()),
-                        post.getViews())
-                )
-                .toList();
-    }
 
     // 게시물 상세 조회
     public PostResDTO getPost(Long userId, Long postId) {
@@ -216,6 +198,19 @@ public class PostService {
         return count != null ? Long.parseLong(count) : 0L;
     }
 
+    private boolean isFollowedByUser(Long userId, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.POST_NOT_FOUND));
+
+        User writer = post.getWriter();
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        return currentUser.getFollowings().stream()
+                .anyMatch(follow -> follow.getFollowing().getId().equals(writer.getId()));
+    }
+
     public Page<FollowingPostResponseDTO> getFollowingUsersPosts(Long userId, Pageable pageable) {
         return postRepository.findFollowingUsersPosts(userId, pageable)
                 .map(post -> FollowingPostResponseDTO.builder()
@@ -224,6 +219,7 @@ public class PostService {
                         .description(post.getDescription())
                         .writerId(post.getWriter().getId())
                         .writerNickname(post.getWriter().getNickname())
+                        .writerImageUrl(post.getWriter().getProfileImage())
                         .likes(getLikeCount(post.getId()))  // Redis에서 좋아요 수 조회
                         .views(post.getViews())
                         .createdAt(post.getCreatedAt())
@@ -239,10 +235,14 @@ public class PostService {
                         .description(post.getDescription())
                         .writerId(post.getWriter().getId())
                         .writerNickname(post.getWriter().getNickname())
+                        .writerImageUrl(post.getWriter().getProfileImage())
                         .likes(getLikeCount(post.getId()))
                         .views(post.getViews())
+                        .images(post.getImages().stream().map(Image::getUrl).toList())
                         .createdAt(post.getCreatedAt())
-                        .isLiked(isLikedByUser(userId, post.getId()))  // 현재 사용자의 좋아요 여부 확인
+                        .isLiked(isLikedByUser(userId, post.getId()))
+                        .isFollowed(isFollowedByUser(userId, post.getId()))
                         .build());
     }
+
 }
