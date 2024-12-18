@@ -5,7 +5,6 @@ import com.devita.domain.post.dto.*;
 import com.devita.domain.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -43,14 +42,6 @@ public class PostController {
         PostResDTO postResDTO = postService.updatePost(userId, postId, postReqDTO);
 
         return ApiResponse.success(postResDTO);
-    }
-
-    // 게시물 페이징 조회
-    @GetMapping("/posts")
-    public ApiResponse<List<PostsResDTO>> getPosts(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
-        List<PostsResDTO> posts = postService.getPosts(page, size);
-
-        return ApiResponse.success(posts);
     }
 
     // 게시물 상세 조회
