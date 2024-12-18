@@ -17,5 +17,6 @@ public record AllPostsResDTO(
         Long views,
         List<String> images,
         LocalDateTime createdAt,
-        boolean isLiked
+        boolean isLiked,
+        boolean isFollowed
 ) {}

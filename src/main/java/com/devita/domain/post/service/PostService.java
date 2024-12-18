@@ -198,6 +198,19 @@ public class PostService {
         return count != null ? Long.parseLong(count) : 0L;
     }
 
+    private boolean isFollowedByUser(Long userId, Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.POST_NOT_FOUND));
+
+        User writer = post.getWriter();
+
+        User currentUser = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
+
+        return currentUser.getFollowings().stream()
+                .anyMatch(follow -> follow.getFollowing().getId().equals(writer.getId()));
+    }
+
     public Page<FollowingPostResponseDTO> getFollowingUsersPosts(Long userId, Pageable pageable) {
         return postRepository.findFollowingUsersPosts(userId, pageable)
                 .map(post -> FollowingPostResponseDTO.builder()
@@ -227,7 +240,8 @@ public class PostService {
                         .views(post.getViews())
                         .images(post.getImages().stream().map(Image::getUrl).toList())
                         .createdAt(post.getCreatedAt())
-                        .isLiked(isLikedByUser(userId, post.getId()))  // 현재 사용자의 좋아요 여부 확인
+                        .isLiked(isLikedByUser(userId, post.getId()))
+                        .isFollowed(isFollowedByUser(userId, post.getId()))
                         .build());
     }
 
