@@ -206,6 +206,7 @@ public class PostService {
                         .description(post.getDescription())
                         .writerId(post.getWriter().getId())
                         .writerNickname(post.getWriter().getNickname())
+                        .writerImageUrl(post.getWriter().getProfileImage())
                         .likes(getLikeCount(post.getId()))  // Redis에서 좋아요 수 조회
                         .views(post.getViews())
                         .createdAt(post.getCreatedAt())
@@ -221,6 +222,7 @@ public class PostService {
                         .description(post.getDescription())
                         .writerId(post.getWriter().getId())
                         .writerNickname(post.getWriter().getNickname())
+                        .writerImageUrl(post.getWriter().getProfileImage())
                         .likes(getLikeCount(post.getId()))
                         .views(post.getViews())
                         .images(post.getImages().stream().map(Image::getUrl).toList())

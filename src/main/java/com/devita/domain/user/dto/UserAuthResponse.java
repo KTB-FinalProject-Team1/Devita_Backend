@@ -11,5 +11,6 @@ public record UserAuthResponse(
         String accessToken,
         String email,
         String nickname,
+        String imageUrl,
         List<CategoryResDTO> categories
 ) {}

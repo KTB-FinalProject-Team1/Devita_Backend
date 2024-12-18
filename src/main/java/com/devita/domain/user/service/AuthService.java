@@ -129,6 +129,7 @@ public class AuthService {
                     .accessToken(newAccessToken)
                     .email(user.getEmail())
                     .nickname(user.getNickname())
+                    .imageUrl(user.getProfileImage())
                     .categories(categories)
                     .build();
 
