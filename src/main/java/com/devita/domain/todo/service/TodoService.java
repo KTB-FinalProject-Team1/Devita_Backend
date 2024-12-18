@@ -5,7 +5,6 @@ import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
 import com.devita.domain.category.domain.Category;
 import com.devita.domain.character.service.RewardService;
-import com.devita.domain.mission.dto.ai.FreeMissionAiReqDTO;
 import com.devita.domain.mission.dto.ai.FreeMissionAiResDTO;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.dto.CalenderDTO;
