@@ -9,7 +9,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class TodoAIReqDTO {
     String title; //Java 공부하기
-    LocalDate Date; // 2024-12-02
+    LocalDate date; // 2024-12-02
     String type; // 일일 미션, 자율 미션
     String missionCategory; // Java, Python
     Long userId; // 1

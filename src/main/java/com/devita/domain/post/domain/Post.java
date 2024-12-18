@@ -5,6 +5,7 @@ import com.devita.domain.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -40,6 +41,7 @@ public class Post extends BaseEntity {
         this.writer = writer;
         this.title = title;
         this.description = description;
+        this.images = new ArrayList<>();
     }
 
     public void updatePost(String title, String description) {
