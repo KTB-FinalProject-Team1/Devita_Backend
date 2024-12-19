@@ -38,12 +38,12 @@ public class Todo extends BaseEntity {
         this.category = category;
         this.missionCategory = missionCategory;
         this.title = title;
-        this.status = status;
+        this.status = status != null ? status : false;
         this.date = date;
     }
 
-    public void toggleSatatus() {
-        this.status = !this.status;
+    public void toggleStatus() {
+        this.status = (this.status == null || !this.status);
     }
 
     public void isDone() {
