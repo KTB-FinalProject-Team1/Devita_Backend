@@ -2,7 +2,6 @@ package com.devita.common.jwt;
 
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.SecurityTokenException;
-import jakarta.servlet.http.Cookie;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
