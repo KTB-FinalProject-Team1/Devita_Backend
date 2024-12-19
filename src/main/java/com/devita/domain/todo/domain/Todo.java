@@ -30,6 +30,7 @@ public class Todo extends BaseEntity {
     private String title;
     private Boolean status;
     private LocalDate date;
+    private Boolean isDone;
 
     @Builder
     private Todo(User user, Category category, String missionCategory, String title, Boolean status, LocalDate date) {
@@ -43,6 +44,10 @@ public class Todo extends BaseEntity {
 
     public void toggleSatatus() {
         this.status = !this.status;
+    }
+
+    public void isDone() {
+        this.isDone = true;
     }
 
     public void updateDetails(Category category, String title, LocalDate date) {

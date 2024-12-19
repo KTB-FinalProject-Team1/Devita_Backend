@@ -90,11 +90,12 @@ public class TodoService {
                 .filter(t -> t.getUser().getId().equals(userId))
                 .orElseThrow(() -> new AccessDeniedException(ErrorCode.TODO_ACCESS_DENIED));
 
-        // 완료 상태가 false -> true로 변경될 때만 보상 지급
         todo.toggleSatatus();
-        todoRepository.save(todo);
 
-        if (todo.getStatus()) {
+        if (!todo.getIsDone()) {
+            if (todo.getCategory().equals("일일 미션") || todo.getCategory().equals("자율 미션")){
+                sendFinishedMission(todo, userId);
+            }
             try {
                 rewardService.processReward(todo.getUser(), todo);
             } catch (IllegalStateException e) {
@@ -102,9 +103,13 @@ public class TodoService {
                 log.warn("보상 지급 실패 {}: {}", todoId, e.getMessage());
             }
         }
+
+        todo.isDone();
+
+        todoRepository.save(todo);
+
     }
 
-    // 미션 완료 시 AI에 보낼 로직 임시 구현
     private void sendFinishedMission(Todo todo, Long userId){
         TodoAIReqDTO request = new TodoAIReqDTO(todo.getTitle(), todo.getDate(), todo.getCategory().getName(), todo.getMissionCategory(), userId);
 
