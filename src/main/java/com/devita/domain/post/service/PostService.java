@@ -160,9 +160,10 @@ public class PostService {
 
         // 이미 좋아요를 눌렀는지 확인하고 추가
         boolean isAdded = setOps.add(likeKey, userId.toString()) == 1;
-
+        log.info("작업 시작");
         if (isAdded) {
             // 좋아요 카운트 증가
+            log.info("redis 증가");
             valueOps.increment(countKey);
         }
 

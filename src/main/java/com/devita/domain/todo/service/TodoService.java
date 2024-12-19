@@ -90,10 +90,12 @@ public class TodoService {
                 .filter(t -> t.getUser().getId().equals(userId))
                 .orElseThrow(() -> new AccessDeniedException(ErrorCode.TODO_ACCESS_DENIED));
 
-        todo.toggleSatatus();
+        log.debug("Before toggle - status: {}, isDone: {}", todo.getStatus(), todo.getIsDone());
+        todo.toggleStatus();  // 메소드 이름 수정
+        log.debug("After toggle - status: {}, isDone: {}", todo.getStatus(), todo.getIsDone());
 
         if (!todo.getIsDone()) {
-            if (todo.getCategory().equals("일일 미션") || todo.getCategory().equals("자율 미션")){
+            if (todo.getCategory().getName().equals("일일 미션") || todo.getCategory().getName().equals("자율 미션")){
                 sendFinishedMission(todo, userId);
             }
             try {
