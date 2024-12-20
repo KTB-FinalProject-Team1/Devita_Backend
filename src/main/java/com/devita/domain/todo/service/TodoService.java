@@ -85,7 +85,7 @@ public class TodoService {
     }
 
     @Transactional
-    public void toggleTodo(Long userId, Long todoId) {
+    public boolean toggleTodo(Long userId, Long todoId) {
         Todo todo = todoRepository.findById(todoId)
                 .filter(t -> t.getUser().getId().equals(userId))
                 .orElseThrow(() -> new AccessDeniedException(ErrorCode.TODO_ACCESS_DENIED));
@@ -108,6 +108,7 @@ public class TodoService {
 
         todoRepository.save(todo);
 
+        return todo.getStatus();
     }
 
     private void sendFinishedMission(Todo todo, Long userId){
