@@ -49,11 +49,9 @@ public class TodoController {
     }
 
     @PutMapping("/{todoId}/toggle")
-    public ApiResponse<StatusDTO> toggleTodoCompletion(@AuthenticationPrincipal Long userId, @PathVariable Long todoId) {
-        StatusDTO result = todoService.toggleTodo(userId, todoId);
+    public ApiResponse<Boolean> toggleTodoCompletion(@AuthenticationPrincipal Long userId, @PathVariable Long todoId) {
+        boolean toggle = todoService.toggleTodo(userId, todoId);
 
-        return ApiResponse.success(result);
+        return ApiResponse.success(toggle);
     }
-
-
 }

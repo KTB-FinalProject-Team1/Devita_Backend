@@ -9,6 +9,7 @@ import java.util.List;
 public record UserAuthResponse(
         String refreshToken,
         String accessToken,
+        String kakaoAccessToken,
         String email,
         String nickname,
         String imageUrl,
