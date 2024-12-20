@@ -86,14 +86,18 @@ public class TodoService {
 
     @Transactional
     public boolean toggleTodo(Long userId, Long todoId) {
+        log.info("진입");
         Todo todo = todoRepository.findById(todoId)
                 .filter(t -> t.getUser().getId().equals(userId))
                 .orElseThrow(() -> new AccessDeniedException(ErrorCode.TODO_ACCESS_DENIED));
 
+        log.info("토글");
         todo.toggleSatatus();
 
         if (!todo.getIsDone()) {
-            if (todo.getCategory().equals("일일 미션") || todo.getCategory().equals("자율 미션")){
+            log.info(todo.getCategory().getName());
+            if (todo.getCategory().getName().equals("일일 미션") || todo.getCategory().getName().equals("자율 미션")){
+                log.info("1번");
                 sendFinishedMission(todo, userId);
             }
             try {
@@ -104,8 +108,10 @@ public class TodoService {
             }
         }
 
+        log.info("2번");
         todo.isDone();
 
+        log.info("3번");
         todoRepository.save(todo);
 
         return todo.getStatus();
