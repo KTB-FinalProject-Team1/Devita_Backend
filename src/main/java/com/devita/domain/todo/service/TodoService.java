@@ -8,6 +8,7 @@ import com.devita.domain.character.service.RewardService;
 import com.devita.domain.mission.dto.ai.FreeMissionAiResDTO;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.dto.CalenderDTO;
+import com.devita.domain.todo.dto.StatusDTO;
 import com.devita.domain.todo.dto.TodoAIReqDTO;
 import com.devita.domain.todo.dto.TodoReqDTO;
 import com.devita.domain.category.repository.CategoryRepository;
@@ -85,17 +86,15 @@ public class TodoService {
     }
 
     @Transactional
-    public void toggleTodo(Long userId, Long todoId) {
+    public StatusDTO toggleTodo(Long userId, Long todoId) {
         Todo todo = todoRepository.findById(todoId)
                 .filter(t -> t.getUser().getId().equals(userId))
                 .orElseThrow(() -> new AccessDeniedException(ErrorCode.TODO_ACCESS_DENIED));
 
-        log.debug("Before toggle - status: {}, isDone: {}", todo.getStatus(), todo.getIsDone());
         todo.toggleStatus();  // 메소드 이름 수정
-        log.debug("After toggle - status: {}, isDone: {}", todo.getStatus(), todo.getIsDone());
 
         if (!todo.getIsDone()) {
-            if (todo.getCategory().getName().equals("일일 미션") || todo.getCategory().getName().equals("자율 미션")){
+            if (todo.getCategory().getName().equals("일일 미션") || todo.getCategory().getName().equals("자율 미션")) {
                 sendFinishedMission(todo, userId);
             }
             try {
@@ -108,11 +107,17 @@ public class TodoService {
 
         todo.isDone();
 
-        todoRepository.save(todo);
+        Todo savedTodo = todoRepository.save(todo);
 
+        return new StatusDTO(
+                savedTodo.getId(),
+                savedTodo.getCategory().getId(),
+                savedTodo.getTitle(),
+                savedTodo.getStatus()
+        );
     }
 
-    private void sendFinishedMission(Todo todo, Long userId){
+    private void sendFinishedMission(Todo todo, Long userId) {
         TodoAIReqDTO request = new TodoAIReqDTO(todo.getTitle(), todo.getDate(), todo.getCategory().getName(), todo.getMissionCategory(), userId);
 
         restTemplate.postForObject(

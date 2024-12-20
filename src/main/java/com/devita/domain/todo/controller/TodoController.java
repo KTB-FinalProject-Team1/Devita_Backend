@@ -2,6 +2,7 @@ package com.devita.domain.todo.controller;
 
 import com.devita.common.response.ApiResponse;
 import com.devita.domain.todo.dto.CalenderDTO;
+import com.devita.domain.todo.dto.StatusDTO;
 import com.devita.domain.todo.dto.TodoReqDTO;
 import com.devita.domain.todo.service.TodoService;
 import lombok.RequiredArgsConstructor;
@@ -48,10 +49,10 @@ public class TodoController {
     }
 
     @PutMapping("/{todoId}/toggle")
-    public ApiResponse<Void> toggleTodoCompletion(@AuthenticationPrincipal Long userId, @PathVariable Long todoId) {
-        todoService.toggleTodo(userId, todoId);
+    public ApiResponse<StatusDTO> toggleTodoCompletion(@AuthenticationPrincipal Long userId, @PathVariable Long todoId) {
+        StatusDTO result = todoService.toggleTodo(userId, todoId);
 
-        return ApiResponse.success(null);
+        return ApiResponse.success(result);
     }
 
 
