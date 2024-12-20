@@ -40,6 +40,7 @@ public class Todo extends BaseEntity {
         this.title = title;
         this.status = status != null ? status : false;
         this.date = date;
+        this.isDone = false;
     }
 
     public void toggleStatus() {

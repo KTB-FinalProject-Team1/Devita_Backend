@@ -32,25 +32,17 @@ public class AuthService {
 
     @Transactional
     public User loadUser(Map<String, Object> attributes){
-        log.info("load user 시작");
-
         Map<String, Object> kakaoAccount = (Map<String, Object>) attributes.get("kakao_account");
-        log.info(kakaoAccount.toString());
         Map<String, Object> properties = (Map<String, Object>) kakaoAccount.get("profile");
-        log.info(properties.toString());
 
         String email = (String) kakaoAccount.get("email");
-        log.info(email);
         String nickname = (String) properties.get("nickname");
-        log.info(nickname);
         String profileImage = (String) properties.get("profile_image_url");
-        log.info(profileImage);
 
         if (email == null) {
             throw new OAuth2AuthenticationException(ErrorCode.TOKEN_NOT_FOUND.getMessage());
         }
 
-        log.info("1번");
         User user = userRepository.findByEmail(email)
                 .orElseGet(() -> {
                     User newUser = User.builder()
@@ -73,7 +65,6 @@ public class AuthService {
 
                     return savedUser;
                 });
-        log.info("2번");
         user.updateNickname(nickname);
         userRepository.save(user);
 

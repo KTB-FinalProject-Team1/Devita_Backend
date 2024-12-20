@@ -28,7 +28,8 @@ public class AuthController {
     public ApiResponse<UserAuthResponse> sendUserInitData(@RequestBody AuthDTO authDTO) {
         log.info("로그인 성공 후 유저 정보를 반환합니다.(액세스 토큰, 닉네임 ...)");
 
-        Map<String, Object> userInfo = kakaoUserInfoService.getUserInfoByCode(authDTO.getKakaoAccessToken());
+        String kakaoAccessToken = kakaoUserInfoService.getKakaoAccessToken(authDTO.getAuthorizationCode());
+        Map<String, Object> userInfo = kakaoUserInfoService.getUserInfo(kakaoAccessToken);
         User user = authService.loadUser(userInfo);
         UserAuthResponse userAuthResponse = authService.issueAccessAndRefreshTokens(user.getId());
 
