@@ -8,8 +8,6 @@ import com.devita.domain.user.service.AuthService;
 import com.devita.domain.user.service.KakaoUserInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -31,8 +29,7 @@ public class AuthController {
         String kakaoAccessToken = kakaoUserInfoService.getKakaoAccessToken(authDTO.getAuthorizationCode());
         Map<String, Object> userInfo = kakaoUserInfoService.getUserInfo(kakaoAccessToken);
         User user = authService.loadUser(userInfo);
-        UserAuthResponse userAuthResponse = authService.issueAccessAndRefreshTokens(user.getId());
-
+        UserAuthResponse userAuthResponse = authService.issueAccessAndRefreshTokens(user.getId(), kakaoAccessToken);
         log.info("userAuthResponse.refreshToken: " + userAuthResponse.refreshToken());
         log.info("userAuthResponse.accessToken: " + userAuthResponse.accessToken());
 
@@ -40,15 +37,8 @@ public class AuthController {
     }
 
     @PostMapping("/reissue")
-//    public ResponseEntity<ApiResponse<String>> refreshAccessToken(@CookieValue("refreshToken") String refreshToken) {
-    public ResponseEntity<ApiResponse<String>> refreshAccessToken(@RequestHeader("Refresh") String refreshToken) {
-        UserAuthResponse response = authService.refreshUserAuth(refreshToken);
+    public ApiResponse<String> refreshAccessToken(@RequestHeader("Refresh") String refreshToken) {
 
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer " + response.accessToken());
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(ApiResponse.success(response.accessToken()));
+        return ApiResponse.success(authService.reissueToken(refreshToken));
     }
 }
