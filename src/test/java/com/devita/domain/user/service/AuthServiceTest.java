@@ -67,7 +67,7 @@ public class AuthServiceTest {
         when(categoryService.findUserCategories(USER_ID)).thenReturn(mockCategories);
 
         // when
-        UserAuthResponse response = authService.refreshUserAuth(REFRESH_TOKEN);
+        UserAuthResponse response = authService.refreshUserAuth(REFRESH_TOKEN, "");
 
         // then
         assertNotNull(response);
