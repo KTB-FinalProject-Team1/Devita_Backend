@@ -69,20 +69,11 @@ public class KakaoUserInfoService {
         }
     }
 
-    /**
-     * 인가 코드를 받아서 사용자 정보를 가져오는 메서드
-     * 1. 인가 코드로 액세스 토큰 발급
-     * 2. 액세스 토큰으로 사용자 정보 요청
-     */
-    public Map<String, Object> getUserInfoByCode(String authorizationCode) {
-        log.info("시작");
-        // 1. 인가 코드로 액세스 토큰 발급
+    public String getKakaoAccessToken(String authorizationCode){
         Map<String, Object> tokenResponse = getAccessToken(authorizationCode);
-        String accessToken = (String) tokenResponse.get("access_token");
-
-        // 2. 발급받은 액세스 토큰으로 사용자 정보 요청
-        return getUserInfo(accessToken);
+        return (String) tokenResponse.get("access_token");
     }
+
 
     /**
      * 액세스 토큰을 이용해 사용자 정보를 가져오는 메서드

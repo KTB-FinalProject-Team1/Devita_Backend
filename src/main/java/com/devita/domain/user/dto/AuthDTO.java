@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class AuthDTO {
-    String kakaoAccessToken;
+    String authorizationCode;
 }
