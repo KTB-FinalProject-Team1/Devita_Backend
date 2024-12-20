@@ -91,7 +91,7 @@ public class AuthServiceTest {
         when(userRepository.findById(USER_ID)).thenReturn(Optional.empty());
 
         // when
-        SecurityTokenException exception = assertThrows(SecurityTokenException.class, () -> authService.refreshUserAuth(REFRESH_TOKEN));
+        SecurityTokenException exception = assertThrows(SecurityTokenException.class, () -> authService.refreshUserAuth(REFRESH_TOKEN,""));
 
         // then
         assertEquals(ErrorCode.INTERNAL_TOKEN_SERVER_ERROR, exception.getErrorCode());

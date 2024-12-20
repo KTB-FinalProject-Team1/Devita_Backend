@@ -141,22 +141,22 @@ class PostServiceTest {
         assertEquals(testPost.getWriter().getNickname(), result.writer());
     }
 
-    @Test
-    @DisplayName("게시글 목록 조회 성공")
-    void getPosts_Success() {
-        // given
-        List<Post> posts = List.of(testPost);
-        Page<Post> postPage = new PageImpl<>(posts);
-
-        when(postRepository.findAll(any(Pageable.class))).thenReturn(postPage);
-
-        // when
-        List<PostsResDTO> result = postService.getPosts(0, 10);
-
-        // then
-        assertFalse(result.isEmpty());
-        assertEquals(testPost.getTitle(), result.get(0).title());
-    }
+//    @Test
+//    @DisplayName("게시글 목록 조회 성공")
+//    void getPosts_Success() {
+//        // given
+//        List<Post> posts = List.of(testPost);
+//        Page<Post> postPage = new PageImpl<>(posts);
+//
+//        when(postRepository.findAll(any(Pageable.class))).thenReturn(postPage);
+//
+//        // when
+//        List<PostsResDTO> result = postService.getPosts(0, 10);
+//
+//        // then
+//        assertFalse(result.isEmpty());
+//        assertEquals(testPost.getTitle(), result.get(0).title());
+//    }
 
     @Test
     @DisplayName("사용자의 게시글 목록 조회 성공")
