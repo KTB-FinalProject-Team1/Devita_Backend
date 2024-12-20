@@ -88,13 +88,13 @@ public class AuthService {
         }
     }
 
-    public UserAuthResponse issueAccessAndRefreshTokens(Long userId) {
+    public UserAuthResponse issueAccessAndRefreshTokens(Long userId, String kakaoAccessToken) {
         String refreshToken = jwtTokenProvider.createRefreshToken(userId);
 
-        return refreshUserAuth(refreshToken);
+        return refreshUserAuth(refreshToken, kakaoAccessToken);
     }
 
-    public UserAuthResponse refreshUserAuth(String refreshToken) {
+    public UserAuthResponse refreshUserAuth(String refreshToken, String kakaoAccessToken) {
         try {
             log.info("액세스 토큰을 생성합니다.");
             Long userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
@@ -111,11 +111,25 @@ public class AuthService {
             return UserAuthResponse.builder()
                     .refreshToken(refreshToken)     // 수정 필요
                     .accessToken(newAccessToken)
+                    .kakaoAccessToken(kakaoAccessToken)
                     .email(user.getEmail())
                     .nickname(user.getNickname())
                     .imageUrl(user.getProfileImage())
                     .categories(categories)
                     .build();
+
+        } catch (Exception e) {
+            log.error("Failed to refresh user authentication: {}", e.getMessage());
+            throw new SecurityTokenException(ErrorCode.INTERNAL_TOKEN_SERVER_ERROR);
+        }
+    }
+
+    public String reissueToken(String refreshToken) {
+        try {
+            log.info("액세스 토큰을 생성합니다.");
+            Long userId = jwtTokenProvider.getUserIdFromRefreshToken(refreshToken);
+
+            return jwtTokenProvider.validateRefreshToken(refreshToken, userId);
 
         } catch (Exception e) {
             log.error("Failed to refresh user authentication: {}", e.getMessage());
