@@ -8,7 +8,6 @@ import com.devita.domain.character.service.RewardService;
 import com.devita.domain.mission.dto.ai.FreeMissionAiResDTO;
 import com.devita.domain.todo.domain.Todo;
 import com.devita.domain.todo.dto.CalenderDTO;
-import com.devita.domain.todo.dto.StatusDTO;
 import com.devita.domain.todo.dto.TodoAIReqDTO;
 import com.devita.domain.todo.dto.TodoReqDTO;
 import com.devita.domain.category.repository.CategoryRepository;
