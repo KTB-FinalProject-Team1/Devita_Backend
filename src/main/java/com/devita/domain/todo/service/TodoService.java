@@ -95,9 +95,9 @@ public class TodoService {
         log.debug("After toggle - status: {}, isDone: {}", todo.getStatus(), todo.getIsDone());
 
         if (!todo.getIsDone()) {
-            if (todo.getCategory().getName().equals("일일 미션") || todo.getCategory().getName().equals("자율 미션")){
-                sendFinishedMission(todo, userId);
-            }
+//            if (todo.getCategory().getName().equals("일일 미션") || todo.getCategory().getName().equals("자율 미션")){
+//                sendFinishedMission(todo, userId);
+//            }
             try {
                 rewardService.processReward(todo.getUser(), todo);
             } catch (IllegalStateException e) {
