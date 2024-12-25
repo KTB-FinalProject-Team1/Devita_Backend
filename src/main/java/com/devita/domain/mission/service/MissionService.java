@@ -102,9 +102,9 @@ public class MissionService {
         return todoRepository.save(todo);
     }
 
-    public List<MissionAiResDTO> requestTestMission(Long userId, String subCategory) {
+    public List<MissionAiResDTO> requestTestMission(String subCategory) {
         try {
-            FreeMissionAiReqDTO request = new FreeMissionAiReqDTO(userId, subCategory);
+            FreeMissionAiReqDTO request = new FreeMissionAiReqDTO(1L, subCategory);
 
             FreeMissionAiResDTO response = restTemplate.postForObject(
                     aiAddress + TEST_MISSION_API,

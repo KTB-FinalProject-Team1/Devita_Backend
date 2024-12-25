@@ -86,20 +86,17 @@ public class TodoService {
 
     @Transactional
     public boolean toggleTodo(Long userId, Long todoId) {
-        log.info("진입");
         Todo todo = todoRepository.findById(todoId)
                 .filter(t -> t.getUser().getId().equals(userId))
                 .orElseThrow(() -> new AccessDeniedException(ErrorCode.TODO_ACCESS_DENIED));
 
-        log.info("토글");
         todo.toggleSatatus();
 
         if (!todo.getIsDone()) {
-            log.info(todo.getCategory().getName());
-            if (todo.getCategory().getName().equals("일일 미션") || todo.getCategory().getName().equals("자율 미션")){
-                log.info("1번");
-                sendFinishedMission(todo, userId);
-            }
+//            if (todo.getCategory().getName().equals("일일 미션") || todo.getCategory().getName().equals("자율 미션")){
+//                log.info("1번");
+//                sendFinishedMission(todo, userId);
+//            }
             try {
                 rewardService.processReward(todo.getUser(), todo);
             } catch (IllegalStateException e) {
@@ -108,16 +105,15 @@ public class TodoService {
             }
         }
 
-        log.info("2번");
         todo.isDone();
 
-        log.info("3번");
         todoRepository.save(todo);
 
         return todo.getStatus();
     }
 
     private void sendFinishedMission(Todo todo, Long userId){
+        log.info("sendFinishedMission");
         TodoAIReqDTO request = new TodoAIReqDTO(todo.getTitle(), todo.getDate(), todo.getCategory().getName(), todo.getMissionCategory(), userId);
 
         restTemplate.postForObject(
@@ -125,6 +121,7 @@ public class TodoService {
                 request,
                 FreeMissionAiResDTO.class
         );
+        log.info("sendFinishedMission 완료");
     }
 
     public List<CalenderDTO> getCalendar(Long userId, String viewType) {

@@ -44,14 +44,14 @@ public class MissionController {
     }
 
     @PostMapping("/test")
-    public ApiResponse<List<MissionAiResDTO>> getTestMission(@AuthenticationPrincipal Long userId, @RequestBody FreeMissionReqDTO freeMissionReqDTO){
-        List<MissionAiResDTO> freeMissions = missionService.requestTestMission(userId, freeMissionReqDTO.subCategory());
+    public ApiResponse<List<MissionAiResDTO>> getTestMission(@RequestBody FreeMissionReqDTO freeMissionReqDTO){
+        List<MissionAiResDTO> freeMissions = missionService.requestTestMission(freeMissionReqDTO.subCategory());
 
         return ApiResponse.success(freeMissions);
     }
 
     @PostMapping("/test/t")
-    public ApiResponse<String> getTesttMission(@AuthenticationPrincipal Long userId, @RequestBody FreeMissionReqDTO freeMissionReqDTO){
+    public ApiResponse<String> getTesttMission(@RequestBody FreeMissionReqDTO freeMissionReqDTO){
 
         return ApiResponse.success("132");
     }
