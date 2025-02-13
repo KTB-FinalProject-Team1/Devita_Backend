@@ -39,26 +39,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
-        if (isRequest(requestURI)) {
-
-            log.info(requestURI + ": 액세스 토큰이 필요없는 작업입니다.");
-            // 쿠키 배열에서 리프레시 토큰을 찾기
-            if (request.getCookies() != null) {
-                for (Cookie cookie : request.getCookies()) {
-                    if ("refreshToken".equals(cookie.getName())) {
-                        String refreshToken = cookie.getValue();
-                        log.info("리프레시 토큰: " + refreshToken);
-                        break;
-                    }
-                }
-            } else {
-                log.info("쿠키가 없습니다.");
-            }
-
-            filterChain.doFilter(request, response);
-            return;
-        }
-
         try {
             log.info(requestURI + ": 액세스 토큰이 필요한 작업입니다.");
             String token = resolveToken(request);
@@ -108,6 +88,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 requestURI.startsWith("/api-docs") ||
                 requestURI.startsWith("/webjars") ||
                 requestURI.startsWith("/api/v1/auth/user/info") ||
-                requestURI.startsWith("/api/v1/auth/reissue");
+                requestURI.startsWith("/api/v1/auth/reissue") ||
+                requestURI.startsWith("/actuator/metrics") ||
+                requestURI.startsWith("/favicon.ico") ||
+                requestURI.startsWith("/actuator/prometheus");
     }
 }
