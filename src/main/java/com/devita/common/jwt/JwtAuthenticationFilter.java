@@ -39,6 +39,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return;
         }
 
+        if (isRequest(requestURI)) {
+
+            log.info(requestURI + ": 액세스 토큰이 필요없는 작업입니다.");
+
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             log.info(requestURI + ": 액세스 토큰이 필요한 작업입니다.");
             String token = resolveToken(request);
@@ -68,6 +76,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // 다음 필터로
+        log.info("다음");
         filterChain.doFilter(request, response);
     }
 
