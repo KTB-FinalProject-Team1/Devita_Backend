@@ -18,4 +18,10 @@ public interface PostRepository extends JpaRepository<Post, Long> {
     @Query(value = "SELECT p FROM Post p JOIN FETCH p.writer w WHERE w.id = :writerId",
             countQuery = "SELECT COUNT(p) FROM Post p WHERE p.writer.id = :writerId")
     Page<Post> findByWriterIdWithFetchJoin(@Param("writerId") Long writerId, Pageable pageable);
+
+    @Query("SELECT p FROM Post p " +
+            "WHERE p.writer.id IN " +
+            "(SELECT f.following.id FROM Follow f WHERE f.follower.id = :userId) " +
+            "ORDER BY p.createdAt DESC")
+    Page<Post> findFollowingUsersPosts(@Param("userId") Long userId, Pageable pageable);
 }

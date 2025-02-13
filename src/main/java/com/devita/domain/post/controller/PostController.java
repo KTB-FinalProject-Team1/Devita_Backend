@@ -1,11 +1,14 @@
 package com.devita.domain.post.controller;
 
 import com.devita.common.response.ApiResponse;
-import com.devita.domain.post.dto.PostReqDTO;
-import com.devita.domain.post.dto.PostResDTO;
-import com.devita.domain.post.dto.PostsResDTO;
+import com.devita.domain.post.dto.*;
 import com.devita.domain.post.service.PostService;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -64,5 +67,30 @@ public class PostController {
         List<PostsResDTO> posts = postService.getMyPosts(userId, page, size);
 
         return ApiResponse.success(posts);
+    }
+
+    @PostMapping("/post/{postId}/like")
+    public ApiResponse<Long> increaseLikesRedis(@AuthenticationPrincipal Long userId, @PathVariable Long postId) {
+        Long likes = postService.likePost(userId, postId);
+        return ApiResponse.success(likes);
+    }
+
+    @PostMapping("/post/{postId}/unlike")
+    public ApiResponse<Long> decreaseLikesRedis(@AuthenticationPrincipal Long userId, @PathVariable Long postId) {
+        Long likes = postService.unlikePost(userId, postId);
+        return ApiResponse.success(likes);
+    }
+
+    @Operation(summary = "팔로우한 사용자들의 게시물 조회")
+    @GetMapping("/feed")
+    public ApiResponse<Page<FollowingPostResponseDTO>> getFollowingUsersPosts(@AuthenticationPrincipal Long userId, @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ApiResponse.success(postService.getFollowingUsersPosts(userId, pageable));
+    }
+
+    @Operation(summary = "전체 게시물 페이징 조회")
+    @GetMapping("/posts/all")
+    public ApiResponse<Page<AllPostsResDTO>> getAllPosts(@AuthenticationPrincipal Long userId, @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ApiResponse.success(postService.getAllPosts(userId, pageable));
     }
 }
