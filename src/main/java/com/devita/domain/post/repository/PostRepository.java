@@ -1,7 +1,6 @@
 package com.devita.domain.post.repository;
 
 import com.devita.domain.post.domain.Post;
-import com.devita.domain.user.domain.User;
 import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

@@ -22,14 +22,15 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class PostServiceTest {
@@ -37,6 +38,9 @@ class PostServiceTest {
     private PostRepository postRepository;
     @Mock
     private UserRepository userRepository;
+
+    @Mock
+    private StringRedisTemplate redisTemplate;
 
     @InjectMocks
     private PostService postService;
@@ -118,6 +122,10 @@ class PostServiceTest {
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(testPost));
         when(postRepository.save(any(Post.class))).thenReturn(testPost);
 
+        String countKey = "post:like_count:" + POST_ID;
+        when(redisTemplate.opsForValue()).thenReturn(mock(ValueOperations.class));
+        when(redisTemplate.opsForValue().get(countKey)).thenReturn("0");
+
         // when
         PostResDTO result = postService.updatePost(USER_ID, POST_ID, updateDTO);
 
@@ -131,6 +139,9 @@ class PostServiceTest {
     void getPost_Success() {
         // given
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(testPost));
+        String countKey = "post:like_count:" + POST_ID;
+        when(redisTemplate.opsForValue()).thenReturn(mock(ValueOperations.class));
+        when(redisTemplate.opsForValue().get(countKey)).thenReturn("0");
 
         // when
         PostResDTO result = postService.getPost(USER_ID, POST_ID);
@@ -149,6 +160,9 @@ class PostServiceTest {
         Page<Post> postPage = new PageImpl<>(posts);
 
         when(postRepository.findAll(any(Pageable.class))).thenReturn(postPage);
+        String countKey = "post:like_count:" + POST_ID;
+        when(redisTemplate.opsForValue()).thenReturn(mock(ValueOperations.class));
+        when(redisTemplate.opsForValue().get(countKey)).thenReturn("0");
 
         // when
         List<PostsResDTO> result = postService.getPosts(0, 10);
@@ -168,6 +182,10 @@ class PostServiceTest {
         when(userRepository.findById(USER_ID)).thenReturn(Optional.of(testUser));
         when(postRepository.findByWriterIdWithFetchJoin(eq(USER_ID), any(Pageable.class)))
                 .thenReturn(postPage);
+
+        String countKey = "post:like_count:" + POST_ID;
+        when(redisTemplate.opsForValue()).thenReturn(mock(ValueOperations.class));
+        when(redisTemplate.opsForValue().get(countKey)).thenReturn("0");
 
         // when
         List<PostsResDTO> result = postService.getMyPosts(USER_ID, 0, 10);
@@ -228,6 +246,9 @@ class PostServiceTest {
         otherUser.setId(2L);
 
         when(postRepository.findById(POST_ID)).thenReturn(Optional.of(testPost));
+        String countKey = "post:like_count:" + POST_ID;
+        when(redisTemplate.opsForValue()).thenReturn(mock(ValueOperations.class));
+        when(redisTemplate.opsForValue().get(countKey)).thenReturn("0");
 
         // when
         postService.getPost(2L, POST_ID);
