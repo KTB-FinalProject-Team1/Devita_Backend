@@ -40,5 +40,5 @@ RUN cp build/libs/devita-0.0.1-SNAPSHOT.jar /app/app.jar
 EXPOSE 8080
 
 # Step 14: 컨테이너 시작 시 MariaDB와 Redis 자동 시작 및 애플리케이션 실행
-CMD service java -jar /app/app.jar
+CMD ["java", "-jar", "/app/app.jar"]
 
