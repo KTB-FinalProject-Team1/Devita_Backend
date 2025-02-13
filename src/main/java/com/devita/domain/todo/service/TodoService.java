@@ -81,7 +81,7 @@ public class TodoService {
                 .orElseThrow(() -> new AccessDeniedException(ErrorCode.TODO_ACCESS_DENIED));
 
         // 완료 상태가 false -> true로 변경될 때만 보상 지급
-        todo.toggleSatatus();
+        todo.toggleStatus();
         todoRepository.save(todo);
 
         if (todo.getStatus()) {

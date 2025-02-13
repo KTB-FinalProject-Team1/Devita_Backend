@@ -43,6 +43,7 @@ public class MissionService {
 
     private static final String DAILY_MISSION_API = "/ai/v1/mission/daily";
     private static final String FREE_MISSION_API = "/ai/v1/mission/free";
+    private static final String TEST_MISSION_API = "/ai/v1/mission/test";
     private static final String FREE_MISSION = "자율 미션";
 
     public DailyMissionAiResDTO requestDailyMission(Long userId, List<String> categories) {
@@ -74,7 +75,7 @@ public class MissionService {
                     FreeMissionAiResDTO.class
             );
 
-            return response != null ? response.missions() : Collections.emptyList();
+            return response != null ? response.getMissions() : Collections.emptyList();
         } catch (RestClientException e) {
             log.error("Failed to request free mission from AI server", e);
             throw new AiServerConnectionException(ErrorCode.AI_SERVER_ERROR);
@@ -98,5 +99,19 @@ public class MissionService {
                 .build();
 
         return todoRepository.save(todo);
+    }
+
+    public List<MissionAiResDTO> requestTestMission(Long userId, String subCategory) {
+        try {
+            FreeMissionAiReqDTO request = new FreeMissionAiReqDTO(userId, subCategory);
+            FreeMissionAiResDTO response = restTemplate.postForObject(
+                    aiAddress + TEST_MISSION_API,
+                    request,
+                    FreeMissionAiResDTO.class
+            );
+            return response != null ? response.getMissions() : Collections.emptyList();
+        } catch (RestClientException e) {
+            throw new AiServerConnectionException(ErrorCode.AI_SERVER_ERROR);
+        }
     }
 }

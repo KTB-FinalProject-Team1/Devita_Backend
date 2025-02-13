@@ -25,21 +25,30 @@ public class Todo extends BaseEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
+    private String missionCategory;
+
     private String title;
     private Boolean status;
     private LocalDate date;
+    private Boolean isDone;
 
     @Builder
-    private Todo(User user, Category category, String title, Boolean status, LocalDate date) {
+    private Todo(User user, Category category, String missionCategory, String title, Boolean status, LocalDate date) {
         this.user = user;
         this.category = category;
+        this.missionCategory = missionCategory;
         this.title = title;
-        this.status = status;
+        this.status = status != null ? status : false;
         this.date = date;
+        this.isDone = false;
     }
 
-    public void toggleSatatus() {
-        this.status = !this.status;
+    public void toggleStatus() {
+        this.status = (this.status == null || !this.status);
+    }
+
+    public void isDone() {
+        this.isDone = true;
     }
 
     public void updateDetails(Category category, String title, LocalDate date) {
