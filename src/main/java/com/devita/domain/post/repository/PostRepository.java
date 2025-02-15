@@ -2,10 +2,14 @@ package com.devita.domain.post.repository;
 
 import com.devita.domain.post.domain.Post;
 import io.lettuce.core.dynamic.annotation.Param;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.Optional;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
@@ -23,4 +27,8 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "(SELECT f.following.id FROM Follow f WHERE f.follower.id = :userId) " +
             "ORDER BY p.createdAt DESC")
     Page<Post> findFollowingUsersPosts(@Param("userId") Long userId, Pageable pageable);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT p FROM Post p WHERE p.id = :postId")
+    Optional<Post> findByIdWithPessimisticLock(@Param("postId") Long postId);
 }

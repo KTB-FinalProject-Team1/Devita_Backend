@@ -22,6 +22,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+import static com.devita.common.exception.ErrorCode.ACCESS_DENIED;
+import static com.devita.common.exception.ErrorCode.POST_NOT_FOUND;
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -77,7 +80,7 @@ public class PostService {
     // 게시물 상세 조회
     public PostResDTO getPost(Long userId, Long postId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.POST_NOT_FOUND));
+                .orElseThrow(() -> new ResourceNotFoundException(POST_NOT_FOUND));
 
         if (!post.getWriter().getId().equals(userId)) {
             post.increaseView();
@@ -114,7 +117,7 @@ public class PostService {
     private Post validateWriter(Long userId, Long postId) {
         Post post = postRepository.findById(postId)
                 .filter(p -> p.getWriter().getId().equals(userId))
-                .orElseThrow(() -> new AccessDeniedException(ErrorCode.ACCESS_DENIED));
+                .orElseThrow(() -> new AccessDeniedException(ACCESS_DENIED));
         return post;
     }
 
@@ -187,5 +190,53 @@ public class PostService {
                         .createdAt(post.getCreatedAt())
                         .isLiked(isLikedByUser(userId, post.getId()))  // 현재 사용자의 좋아요 여부 확인
                         .build());
+    }
+
+    // LikeTest - Redis
+    @Transactional
+    public Long likePostWithRedis(Long userId, Long postId) {
+        ValueOperations<String, String> valueOps = redisTemplate.opsForValue();
+        String countKey = LIKE_COUNT_KEY_PREFIX + postId;
+        valueOps.increment(countKey);
+        return Long.parseLong(valueOps.get(countKey));
+    }
+
+    // LikeTest - Pessimistic-Lock)
+    @Transactional
+    public Long increaseLikePessimistic(Long userId, Long postId) {
+        Post post = postRepository.findByIdWithPessimisticLock(postId)
+                .orElseThrow(() -> new ResourceNotFoundException(POST_NOT_FOUND));
+        post.updateLikes(post.getLikes() + 1);
+        postRepository.save(post);
+        return post.getLikes();
+    }
+
+    // LikeTest - Optimistic-Lock)
+    @Transactional
+    public Long increaseLikeOptimistic(Long userId, Long postId) {
+        int maxRetry = 100; // 최대 시도 횟수
+        int attempt = 0;    // 현재 시도 횟수
+        while (attempt < maxRetry) {
+            try {
+                // 트랜잭션 내에서 좋아요 증가 처리
+                return updateLikeCount(postId);
+            } catch (RuntimeException e) {
+                attempt++;
+                if (attempt >= maxRetry) {
+                    throw new AccessDeniedException(ACCESS_DENIED);
+                }
+            }
+        }
+        // 실패할 경우 기본값 반환 (일반적으로 여기 도달하지 않음)
+        throw new IllegalStateException("Unexpected state in like update process.");
+    }
+
+    // LikeTest - Default
+    @Transactional
+    public Long updateLikeCount(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new ResourceNotFoundException(POST_NOT_FOUND));
+        post.updateLikes(post.getLikes() + 1); // 좋아요 증가
+        return post.getLikes();
     }
 }

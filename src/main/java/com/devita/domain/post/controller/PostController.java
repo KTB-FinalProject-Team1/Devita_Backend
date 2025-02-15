@@ -93,4 +93,22 @@ public class PostController {
     public ApiResponse<Page<AllPostsResDTO>> getAllPosts(@AuthenticationPrincipal Long userId, @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         return ApiResponse.success(postService.getAllPosts(userId, pageable));
     }
+
+    @PostMapping("/post/{postId}/like/redis")
+    public ApiResponse<Long> increaseLikesRedisTest(@AuthenticationPrincipal Long userId, @PathVariable Long postId) {
+        Long likes = postService.likePostWithRedis(userId, postId);
+        return ApiResponse.success(likes);
+    }
+
+    @PostMapping("/post/{postId}/like/pessimistic-lock")
+    public ApiResponse<Long> increaseLikePessimisticTest(@AuthenticationPrincipal Long userId, @PathVariable Long postId) {
+        Long likes = postService.increaseLikePessimistic(userId, postId);
+        return ApiResponse.success(likes);
+    }
+
+    @PostMapping("/post/{postId}/like/optimistic-lock")
+    public ApiResponse<Long> increaseLikeOptimisticTest(@AuthenticationPrincipal Long userId, @PathVariable Long postId) {
+        Long likes = postService.increaseLikeOptimistic(userId, postId);
+        return ApiResponse.success(likes);
+    }
 }
