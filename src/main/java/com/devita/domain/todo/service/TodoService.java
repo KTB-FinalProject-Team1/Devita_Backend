@@ -75,7 +75,7 @@ public class TodoService {
     }
 
     @Transactional
-    public void toggleTodo(Long userId, Long todoId) {
+    public boolean toggleTodo(Long userId, Long todoId) {
         Todo todo = todoRepository.findById(todoId)
                 .filter(t -> t.getUser().getId().equals(userId))
                 .orElseThrow(() -> new AccessDeniedException(ErrorCode.TODO_ACCESS_DENIED));
@@ -92,6 +92,8 @@ public class TodoService {
                 log.warn("보상 지급 실패 {}: {}", todoId, e.getMessage());
             }
         }
+
+        return todo.getStatus();
     }
 
     public List<CalenderDTO> getCalendar(Long userId, String viewType) {
