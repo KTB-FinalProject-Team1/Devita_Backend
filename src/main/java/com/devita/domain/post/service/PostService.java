@@ -3,6 +3,7 @@ package com.devita.domain.post.service;
 import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
+import com.devita.domain.follow.service.FollowService;
 import com.devita.domain.post.domain.Post;
 import com.devita.domain.post.dto.*;
 import com.devita.domain.post.repository.PostRepository;

@@ -20,4 +20,13 @@ public class FollowResponseDTO {
                 .profileImage(user.getProfileImage())
                 .build();
     }
+
+    // User 객체를 받아서 DTO로 변환
+    public static FollowResponseDTO from(User user) {
+        return FollowResponseDTO.builder()
+                .userId(user.getId())
+                .nickname(user.getNickname())
+                .profileImage(user.getProfileImage())
+                .build();
+    }
 }
