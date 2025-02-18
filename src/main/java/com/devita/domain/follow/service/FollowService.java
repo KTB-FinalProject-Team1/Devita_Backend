@@ -78,7 +78,7 @@ public class FollowService {
                 .orElseThrow(() -> new ResourceNotFoundException(ErrorCode.USER_NOT_FOUND));
     }
 
-    private Set<String> getAndCacheFollowingIds(Long userId) {
+    public Set<String> getAndCacheFollowingIds(Long userId) {
         SetOperations<String, String> setOps = redisTemplate.opsForSet();
         Set<String> followingIds = setOps.members(FOLLOWING_KEY.replace("{userId}", userId.toString()));
 
@@ -98,7 +98,7 @@ public class FollowService {
         return followingIds;
     }
 
-    private Set<String> getAndCacheFollowerIds(Long targetUserId) {
+    public Set<String> getAndCacheFollowerIds(Long targetUserId) {
         SetOperations<String, String> setOps = redisTemplate.opsForSet();
         Set<String> followerIds = setOps.members(FOLLOWER_KEY.replace("{userId}", targetUserId.toString()));
 

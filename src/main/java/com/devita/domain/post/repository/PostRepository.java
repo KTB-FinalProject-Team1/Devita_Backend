@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.Optional;
+import java.util.Set;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
@@ -27,6 +28,11 @@ public interface PostRepository extends JpaRepository<Post, Long> {
             "(SELECT f.following.id FROM Follow f WHERE f.follower.id = :userId) " +
             "ORDER BY p.createdAt DESC")
     Page<Post> findFollowingUsersPosts(@Param("userId") Long userId, Pageable pageable);
+
+    @Query("SELECT p FROM Post p " +
+            "WHERE p.writer.id IN :followingIds " +
+            "ORDER BY p.createdAt DESC")
+    Page<Post> findFollowingUsersPostsByIds(@Param("followIds") Set<String> followingIds, Pageable pageable);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT p FROM Post p WHERE p.id = :postId")

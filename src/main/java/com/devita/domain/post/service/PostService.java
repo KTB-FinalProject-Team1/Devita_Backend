@@ -3,6 +3,7 @@ package com.devita.domain.post.service;
 import com.devita.common.exception.AccessDeniedException;
 import com.devita.common.exception.ErrorCode;
 import com.devita.common.exception.ResourceNotFoundException;
+import com.devita.domain.follow.repository.FollowRepository;
 import com.devita.domain.follow.service.FollowService;
 import com.devita.domain.post.domain.Post;
 import com.devita.domain.post.dto.*;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.devita.common.exception.ErrorCode.ACCESS_DENIED;
 import static com.devita.common.exception.ErrorCode.POST_NOT_FOUND;
@@ -33,6 +35,7 @@ public class PostService {
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final FollowService followService;
     private final StringRedisTemplate redisTemplate;
 
     private static final String LIKE_KEY_PREFIX = "post:like:";
@@ -164,7 +167,16 @@ public class PostService {
     }
 
     public Page<FollowingPostResponseDTO> getFollowingUsersPosts(Long userId, Pageable pageable) {
-        return postRepository.findFollowingUsersPosts(userId, pageable)
+        // Redis에서 팔로잉 아이디를 가져오기
+        Set<String> followingIds = followService.getAndCacheFollowingIds(userId);
+
+        // 팔로잉 유저가 없으면 빈 페이지 반환
+        if (followingIds.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
+        // 팔로잉 아이디들을 사용하여 게시물 조회
+        return postRepository.findFollowingUsersPostsByIds(followingIds, pageable)
                 .map(post -> FollowingPostResponseDTO.builder()
                         .id(post.getId())
                         .title(post.getTitle())
@@ -176,6 +188,19 @@ public class PostService {
                         .createdAt(post.getCreatedAt())
                         .isLiked(isLikedByUser(userId, post.getId()))  // 현재 사용자의 좋아요 여부 확인
                         .build());
+
+//        return postRepository.findFollowingUsersPosts(userId, pageable)
+//                .map(post -> FollowingPostResponseDTO.builder()
+//                        .id(post.getId())
+//                        .title(post.getTitle())
+//                        .description(post.getDescription())
+//                        .writerId(post.getWriter().getId())
+//                        .writerNickname(post.getWriter().getNickname())
+//                        .likes(getLikeCount(post.getId()))  // Redis에서 좋아요 수 조회
+//                        .views(post.getViews())
+//                        .createdAt(post.getCreatedAt())
+//                        .isLiked(isLikedByUser(userId, post.getId()))  // 현재 사용자의 좋아요 여부 확인
+//                        .build());
     }
 
     public Page<AllPostsResDTO> getAllPosts(Long userId, Pageable pageable) {
